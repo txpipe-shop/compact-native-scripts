@@ -1,0 +1,29 @@
+{
+  "name": "compact-native-scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.1",
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@types/node": "^25.6.0",
+    "eslint": "^10.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^15.14.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
+    "turbo": "^2.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.29.0"
+  }
+}
