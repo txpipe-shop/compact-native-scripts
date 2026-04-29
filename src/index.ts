@@ -1,5 +1,5 @@
 function main() {
-  console.log("Compact native scripts");
+  console.log('Compact native scripts');
 }
 
 main();

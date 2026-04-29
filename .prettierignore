@@ -1,0 +1,9 @@
+node_modules/
+**/dist/
+**/managed/
+dist/
+**/managed/
+**/*.compact
+.turbo/
+pnpm-lock.yaml
+*.min.js
