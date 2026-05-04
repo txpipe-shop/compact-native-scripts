@@ -58,9 +58,18 @@ function main() {
   test('any type', jsonAny);
   test('atLeast type', jsonAtLeast);
   test('nested script', jsonNested);
-  test('single sig script', {
+  test('single cmt clause', {
     hash: 'd92b712d1882c3b0f75b6f677e0b2cbef4fbc8b8121bb9dde324ff09abcdef01',
     type: 'cmt',
+  });
+  test('single after clause', { block: 1000, type: 'after' });
+  test('single before clause', { block: 3000, type: 'before' });
+  test('all with after + cmt', {
+    scripts: [
+      { block: 1000, type: 'after' },
+      { hash: '966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c3700000000', type: 'cmt' },
+    ],
+    type: 'all',
   });
 }
 

@@ -21,6 +21,31 @@ const CommmitmentSchema = z
   .describe('Commitment clause - signature-equivalent verification against a commitment hash');
 export type CommmitmentSchema = z.infer<typeof CommmitmentSchema>;
 
+// Time lock clauses (leaf, no recursion needed)
+const AfterClauseSchema = z
+  .object({
+    type: z.literal('after').describe('Time-after clause type'),
+    block: z
+      .number()
+      .int()
+      .min(0, 'Block must be a non-negative integer')
+      .describe('Block number (transaction must be at or after)'),
+  })
+  .describe('After clause - validates that the current block is at or after the specified block');
+export type AfterClauseSchema = z.infer<typeof AfterClauseSchema>;
+
+const BeforeClauseSchema = z
+  .object({
+    type: z.literal('before').describe('Time-before clause type'),
+    block: z
+      .number()
+      .int()
+      .min(0, 'Block must be a non-negative integer')
+      .describe('Block number (transaction must be before)'),
+  })
+  .describe('Before clause - validates that the current block is before the specified block');
+export type BeforeClauseSchema = z.infer<typeof BeforeClauseSchema>;
+
 // Composite script schemas - defined once, reused in both BaseScriptSchema and NativeScriptSchema
 const AnyScriptSchema = z
   .object({
@@ -49,7 +74,9 @@ const AtLeastScriptSchema = z
       .number()
       .int()
       .min(1, 'Required must be at least 1')
-      .describe('Minimum number of scripts that must be satisfied'),
+      .describe(
+        'Minimum number of scripts that must be satisfied, must be equal to or less than the amount of scripts'
+      ),
     scripts: z.lazy(() => z.array(BaseScriptSchema)).describe('Scripts to evaluate'),
   })
   .refine((obj) => obj.required <= obj.scripts.length)
@@ -61,6 +88,8 @@ const BaseScriptSchema: z.ZodType<unknown> = z.lazy(() =>
   z
     .discriminatedUnion('type', [
       CommmitmentSchema,
+      AfterClauseSchema,
+      BeforeClauseSchema,
       AnyScriptSchema,
       AllScriptSchema,
       AtLeastScriptSchema,
@@ -69,15 +98,17 @@ const BaseScriptSchema: z.ZodType<unknown> = z.lazy(() =>
 );
 export type BaseScriptSchema = z.infer<typeof BaseScriptSchema>;
 
-// Top-level schema - only composite types allowed (no standalone sig scripts)
-const NativeScriptSchema = z
-  .discriminatedUnion('type', [AnyScriptSchema, AllScriptSchema, AtLeastScriptSchema])
-  .describe('Top-level native script - composite types only (no standalone signature scripts)');
+// Top-level entry point — alias of BaseScriptSchema with its own description
+const NativeScriptSchema = BaseScriptSchema.describe(
+  'Native script - top-level entry point (all clause types allowed)'
+);
 export type NativeScriptSchema = z.infer<typeof NativeScriptSchema>;
 
 export {
   Uint8ArraySchema,
   CommmitmentSchema,
+  AfterClauseSchema,
+  BeforeClauseSchema,
   AnyScriptSchema,
   AllScriptSchema,
   AtLeastScriptSchema,

@@ -4,12 +4,12 @@
 
 This project provides Zod schemas for parsing and validating JSON inputs similar to Cardano native scripts, with input normalization (hex strings → Uint8Array via `fromHex` from `@midnight-ntwrk/compact-runtime`).
 
-`NativeScriptSchema` is the top-level entry point for validation. It accepts only composite script types (`any`, `all`, `atLeast`), rejecting standalone commitment scripts at the root level. This enforces that native scripts always contain nested logic rather than a single condition.
+`NativeScriptSchema` is the top-level entry point for validation. It accepts all clause types — commitment, time locks (`after`, `before`), and composites (`any`, `all`, `atLeast`) — at any level, matching the full native script BNF.
 
 The schemas are organized into three layers, and this document follows the same structure:
 
 - **Base** — primitive types used by other schemas (e.g. `Uint8ArraySchema` for hex normalization)
-- **Leaf** — terminal clauses that cannot contain other clauses (e.g. `CommmitmentSchema`)
+- **Leaf** — terminal clauses that cannot contain other clauses (e.g. `CommmitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`)
 - **Composite** — scripts that contain a `scripts` array of nested clauses or scripts, enabling arbitrary nesting
 
 ---
@@ -46,6 +46,46 @@ The schemas are organized into three layers, and this document follows the same 
 
 - `type`: Literal `"cmt"`
 - `hash`: A `Uint8ArraySchema` value (32-byte commitment hash as Uint8Array)
+
+---
+
+## Time Lock Clauses
+
+### AfterClauseSchema
+
+**Purpose**: Validates that the transaction is valid at or after the specified block. Corresponds to `RequireTimeAfter` in the Cardano native script BNF.
+
+**Shape**:
+
+```typescript
+{
+  type: "after",
+  block: number  // non-negative integer
+}
+```
+
+**Fields**:
+
+- `type`: Literal `"after"`
+- `block`: Non-negative integer — the transaction must have a validity interval lower bound at or after this block
+
+### BeforeClauseSchema
+
+**Purpose**: Validates that the transaction is valid before the specified block. Corresponds to `RequireTimeBefore` in the Cardano native script BNF.
+
+**Shape**:
+
+```typescript
+{
+  type: "before",
+  block: number  // non-negative integer
+}
+```
+
+**Fields**:
+
+- `type`: Literal `"before"`
+- `block`: Non-negative integer — the transaction must have a validity interval upper bound at or before this block (exclusive)
 
 ---
 
@@ -95,7 +135,7 @@ All composite scripts contain a `scripts` array that can hold nested scripts (le
 
 **Fields**:
 
-- `required`: Integer ≥ 1, specifies minimum number of scripts that must be satisfied.
+- `required`: Integer ≥ 1 and ≤ the number of scripts. Specifies the minimum number of scripts that must be satisfied. Validation fails if `required` exceeds the length of `scripts`.
 
 ---
 
@@ -105,17 +145,15 @@ All composite scripts contain a `scripts` array that can hold nested scripts (le
 
 **Purpose**: Union of all script types for use inside `scripts` arrays.
 
-**Includes**: `CommmitmentSchema`, `AnyScriptSchema`, `AllScriptSchema`, `AtLeastScriptSchema`
+**Includes**: `CommmitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`, `AnyScriptSchema`, `AllScriptSchema`, `AtLeastScriptSchema`
 
 **Type**: Recursive (`scripts` arrays can contain `BaseScriptSchema` instances)
 
 ### NativeScriptSchema
 
-**Purpose**: Top-level schema — only allows composite script types.
+**Purpose**: Top-level schema — accepts all clause types (leaf or composite).
 
-**Includes**: `AnyScriptSchema`, `AllScriptSchema`, `AtLeastScriptSchema`
-
-**Note**: Standalone `{ type: "cmt", hash: "..." }` objects are rejected at the top level.
+**Includes**: `CommmitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`, `AnyScriptSchema`, `AllScriptSchema`, `AtLeastScriptSchema`
 
 ---
 
@@ -146,6 +184,39 @@ All composite scripts contain a `scripts` array that can hold nested scripts (le
     { "type": "cmt", "hash": "d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef012345" },
     { "type": "cmt", "hash": "e5f6789012345678abcdef0123456789abcdef0123456789abcdef01234501" },
     { "type": "cmt", "hash": "f6789012345678abcdef0123456789abcdef0123456789abcdef0123456789" }
+  ]
+}
+```
+
+### All with time lock
+
+```json
+{
+  "type": "all",
+  "scripts": [
+    { "type": "after", "block": 1000 },
+    { "type": "cmt", "hash": "966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c3700000000" }
+  ]
+}
+```
+
+### Any with nested time lock
+
+```json
+{
+  "type": "any",
+  "scripts": [
+    { "type": "cmt", "hash": "b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d39853800000000" },
+    {
+      "type": "all",
+      "scripts": [
+        { "type": "before", "block": 3000 },
+        {
+          "type": "cmt",
+          "hash": "966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c3700000000"
+        }
+      ]
+    }
   ]
 }
 ```
