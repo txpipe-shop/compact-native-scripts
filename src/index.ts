@@ -18,7 +18,7 @@ const jsonAtLeast = {
     { keyHash: 'f6789012345678abcdef0123456789abcdef0123456789abcdef0123456789ab', type: 'sig' },
     { keyHash: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', type: 'sig' },
   ],
-  required: 2,
+  required: 4,
   type: 'atLeast',
 };
 
@@ -30,8 +30,14 @@ const jsonNested = {
     {
       type: 'all',
       scripts: [
-        { keyHash: 'a1b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01', type: 'sig' },
-        { keyHash: 'b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef0100', type: 'sig' },
+        {
+          keyHash: 'a1b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01',
+          type: 'sig',
+        },
+        {
+          keyHash: 'b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef0100',
+          type: 'sig',
+        },
       ],
     },
     { keyHash: 'c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef010000', type: 'sig' },

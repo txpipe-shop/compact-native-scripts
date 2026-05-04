@@ -10,10 +10,12 @@ const Uint8ArraySchema = z
       .transform((hex) => fromHex(hex)),
   ])
   .describe('Uint8Array or 64-char lowercase hex string, transformed to Uint8Array');
+export type Uint8ArraySchema = z.infer<typeof Uint8ArraySchema>;
 
 const CommmitmentSchema = Uint8ArraySchema.describe(
   'A commitment value (public key hash) as Uint8Array'
 );
+export type CommmitmentSchema = z.infer<typeof CommmitmentSchema>;
 
 // Sig script (leaf, no recursion needed)
 const SigScriptSchema = z
@@ -22,6 +24,7 @@ const SigScriptSchema = z
     keyHash: CommmitmentSchema.describe('Public key hash (32 bytes)'),
   })
   .describe('Signature script - verifies a transaction against a public key hash');
+export type SigScriptSchema = z.infer<typeof SigScriptSchema>;
 
 // Composite script schemas - defined once, reused in both BaseScriptSchema and NativeScriptSchema
 const AnyScriptSchema = z
@@ -32,6 +35,7 @@ const AnyScriptSchema = z
       .describe('Scripts to evaluate (any one must satisfy)'),
   })
   .describe('Any script - at least one of the contained scripts must be satisfied');
+export type AnyScriptSchema = z.infer<typeof AnyScriptSchema>;
 
 const AllScriptSchema = z
   .object({
@@ -41,6 +45,7 @@ const AllScriptSchema = z
       .describe('Scripts to evaluate (all must satisfy)'),
   })
   .describe('All script - all of the contained scripts must be satisfied');
+export type AllScriptSchema = z.infer<typeof AllScriptSchema>;
 
 const AtLeastScriptSchema = z
   .object({
@@ -52,7 +57,9 @@ const AtLeastScriptSchema = z
       .describe('Minimum number of scripts that must be satisfied'),
     scripts: z.lazy(() => z.array(BaseScriptSchema)).describe('Scripts to evaluate'),
   })
+  .refine((obj) => obj.required <= obj.scripts.length)
   .describe('AtLeast script - at least N of the contained scripts must be satisfied');
+export type AtLeastScriptSchema = z.infer<typeof AtLeastScriptSchema>;
 
 // Base script schema - includes all types (leaf + composite) for use inside scripts arrays
 const BaseScriptSchema: z.ZodType<unknown> = z.lazy(() =>
@@ -65,11 +72,13 @@ const BaseScriptSchema: z.ZodType<unknown> = z.lazy(() =>
     ])
     .describe('Native script (leaf or composite) for use inside scripts arrays')
 );
+export type BaseScriptSchema = z.infer<typeof BaseScriptSchema>;
 
 // Top-level schema - only composite types allowed (no standalone sig scripts)
 const NativeScriptSchema = z
   .discriminatedUnion('type', [AnyScriptSchema, AllScriptSchema, AtLeastScriptSchema])
   .describe('Top-level native script - composite types only (no standalone signature scripts)');
+export type NativeScriptSchema = z.infer<typeof NativeScriptSchema>;
 
 export {
   Uint8ArraySchema,
