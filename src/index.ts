@@ -3,9 +3,9 @@ import { NativeScriptSchema } from './schema';
 // Test 1: "any" type with multiple sig scripts
 const jsonAny = {
   scripts: [
-    { keyHash: 'a1b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01', type: 'sig' },
-    { keyHash: 'b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef0123', type: 'sig' },
-    { keyHash: 'c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef012345', type: 'sig' },
+    { hash: 'a1b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01', type: 'cmt' },
+    { hash: 'b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef0123', type: 'cmt' },
+    { hash: 'c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef012345', type: 'cmt' },
   ],
   type: 'any',
 };
@@ -13,10 +13,10 @@ const jsonAny = {
 // Test 2: "atLeast" type with required field
 const jsonAtLeast = {
   scripts: [
-    { keyHash: 'd4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01234567', type: 'sig' },
-    { keyHash: 'e5f6789012345678abcdef0123456789abcdef0123456789abcdef0123450123', type: 'sig' },
-    { keyHash: 'f6789012345678abcdef0123456789abcdef0123456789abcdef0123456789ab', type: 'sig' },
-    { keyHash: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', type: 'sig' },
+    { hash: 'd4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01234567', type: 'cmt' },
+    { hash: 'e5f6789012345678abcdef0123456789abcdef0123456789abcdef0123450123', type: 'cmt' },
+    { hash: 'f6789012345678abcdef0123456789abcdef0123456789abcdef0123456789ab', type: 'cmt' },
+    { hash: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', type: 'cmt' },
   ],
   required: 4,
   type: 'atLeast',
@@ -31,16 +31,16 @@ const jsonNested = {
       type: 'all',
       scripts: [
         {
-          keyHash: 'a1b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01',
-          type: 'sig',
+          hash: 'a1b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01',
+          type: 'cmt',
         },
         {
-          keyHash: 'b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef0100',
-          type: 'sig',
+          hash: 'b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef0100',
+          type: 'cmt',
         },
       ],
     },
-    { keyHash: 'c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef010000', type: 'sig' },
+    { hash: 'c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef010000', type: 'cmt' },
   ],
 };
 
@@ -59,8 +59,8 @@ function main() {
   test('atLeast type', jsonAtLeast);
   test('nested script', jsonNested);
   test('single sig script', {
-    keyHash: 'd92b712d1882c3b0f75b6f677e0b2cbef4fbc8b8121bb9dde324ff09abcdef01',
-    type: 'sig',
+    hash: 'd92b712d1882c3b0f75b6f677e0b2cbef4fbc8b8121bb9dde324ff09abcdef01',
+    type: 'cmt',
   });
 }
 

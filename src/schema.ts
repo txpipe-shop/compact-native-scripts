@@ -12,19 +12,14 @@ const Uint8ArraySchema = z
   .describe('Uint8Array or 64-char lowercase hex string, transformed to Uint8Array');
 export type Uint8ArraySchema = z.infer<typeof Uint8ArraySchema>;
 
-const CommmitmentSchema = Uint8ArraySchema.describe(
-  'A commitment value (public key hash) as Uint8Array'
-);
-export type CommmitmentSchema = z.infer<typeof CommmitmentSchema>;
-
-// Sig script (leaf, no recursion needed)
-const SigScriptSchema = z
+// Commitment clause (leaf, signature-equivalent)
+const CommmitmentSchema = z
   .object({
-    type: z.literal('sig').describe('Signature verification script type'),
-    keyHash: CommmitmentSchema.describe('Public key hash (32 bytes)'),
+    type: z.literal('cmt').describe('Commitment verification clause type'),
+    hash: Uint8ArraySchema.describe('Commitment hash (32 bytes)'),
   })
-  .describe('Signature script - verifies a transaction against a public key hash');
-export type SigScriptSchema = z.infer<typeof SigScriptSchema>;
+  .describe('Commitment clause - signature-equivalent verification against a commitment hash');
+export type CommmitmentSchema = z.infer<typeof CommmitmentSchema>;
 
 // Composite script schemas - defined once, reused in both BaseScriptSchema and NativeScriptSchema
 const AnyScriptSchema = z
@@ -65,7 +60,7 @@ export type AtLeastScriptSchema = z.infer<typeof AtLeastScriptSchema>;
 const BaseScriptSchema: z.ZodType<unknown> = z.lazy(() =>
   z
     .discriminatedUnion('type', [
-      SigScriptSchema,
+      CommmitmentSchema,
       AnyScriptSchema,
       AllScriptSchema,
       AtLeastScriptSchema,
@@ -83,7 +78,6 @@ export type NativeScriptSchema = z.infer<typeof NativeScriptSchema>;
 export {
   Uint8ArraySchema,
   CommmitmentSchema,
-  SigScriptSchema,
   AnyScriptSchema,
   AllScriptSchema,
   AtLeastScriptSchema,
