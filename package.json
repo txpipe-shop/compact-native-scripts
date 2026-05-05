@@ -25,5 +25,9 @@
     "turbo": "^2.8.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.29.0"
+  },
+  "dependencies": {
+    "zod": "^4.3.6",
+    "@midnight-ntwrk/compact-runtime": "0.16.0"
   }
 }
