@@ -5,7 +5,7 @@ CLI-based application to generate compact code that checks commitments based on 
 ## Usage
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Runs the test suite validating sample JSON inputs against the script schemas.
