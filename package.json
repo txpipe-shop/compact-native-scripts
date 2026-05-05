@@ -1,10 +1,13 @@
 {
   "name": "compact-native-scripts",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "start": "tsx src/cli.ts",
+    "build": "tsc",
+    "clean": "rm -rf dist generated tsconfig.tsbuildinfo",
     "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",
     "lint": "eslint .",
@@ -27,7 +30,8 @@
     "typescript-eslint": "^8.29.0"
   },
   "dependencies": {
-    "zod": "^4.3.6",
-    "@midnight-ntwrk/compact-runtime": "0.16.0"
+    "@midnight-ntwrk/compact-runtime": "0.16.0",
+    "commander": "^14.0.3",
+    "zod": "^4.3.6"
   }
 }
