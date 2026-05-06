@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { fromHex } from '@midnight-ntwrk/compact-runtime';
 
-// Union of all valid script types for recursive schema
+/**
+ * Union of all valid script types for recursive schema
+ */
 type BaseScript = { type: 'cmt'; hash: Uint8Array }
   | { type: 'after'; block: number }
   | { type: 'before'; block: number }

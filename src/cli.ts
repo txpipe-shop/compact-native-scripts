@@ -4,6 +4,7 @@ import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { NativeScriptSchema } from './schema.js';
+import { generateCompact } from './generator/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 program.description('CLI-based tool to generate Compact code.');
@@ -26,10 +27,11 @@ function main() {
     process.exit(1);
   }
 
+  const compactCode = generateCompact(result.data);
   const outputDir = path.resolve(__dirname, '../generated');
   mkdirSync(outputDir, { recursive: true });
-  const outputPath = path.join(outputDir, 'contract.compact');
-  writeFileSync(outputPath, '// TODO: Generated Compact contract\n', 'utf-8');
+  const outputPath = path.join(outputDir, 'Warden.compact');
+  writeFileSync(outputPath, compactCode, 'utf-8');
 
   console.log(`✅ Valid script. Output written to: ${outputPath}`);
 }
