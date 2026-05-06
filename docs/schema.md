@@ -9,7 +9,7 @@ This project provides Zod schemas for parsing and validating JSON inputs similar
 The schemas are organized into three layers, and this document follows the same structure:
 
 - **Base** — primitive types used by other schemas (e.g. `Uint8ArraySchema` for hex normalization)
-- **Leaf** — terminal clauses that cannot contain other clauses (e.g. `CommmitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`)
+- **Leaf** — terminal clauses that cannot contain other clauses (e.g. `CommitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`)
 - **Composite** — scripts that contain a `scripts` array of nested clauses or scripts, enabling arbitrary nesting
 
 ---
@@ -29,7 +29,7 @@ The schemas are organized into three layers, and this document follows the same 
 
 ---
 
-## Leaf Clause: CommmitmentSchema
+## Leaf Clause: CommitmentSchema
 
 **Purpose**: Commitment verification against a commitment hash, functioning as a signature-equivalent verifier. Rather than checking a cryptographic signature, it validates that the transaction was authorized by proving knowledge of a secret corresponding to the commitment hash.
 
@@ -145,7 +145,7 @@ All composite scripts contain a `scripts` array that can hold nested scripts (le
 
 **Purpose**: Union of all script types for use inside `scripts` arrays.
 
-**Includes**: `CommmitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`, `AnyScriptSchema`, `AllScriptSchema`, `AtLeastScriptSchema`
+**Includes**: `CommitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`, `AnyScriptSchema`, `AllScriptSchema`, `AtLeastScriptSchema`
 
 **Type**: Recursive (`scripts` arrays can contain `BaseScriptSchema` instances)
 
@@ -153,7 +153,7 @@ All composite scripts contain a `scripts` array that can hold nested scripts (le
 
 **Purpose**: Top-level schema — accepts all clause types (leaf or composite).
 
-**Includes**: `CommmitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`, `AnyScriptSchema`, `AllScriptSchema`, `AtLeastScriptSchema`
+**Includes**: `CommitmentSchema`, `AfterClauseSchema`, `BeforeClauseSchema`, `AnyScriptSchema`, `AllScriptSchema`, `AtLeastScriptSchema`
 
 ---
 
