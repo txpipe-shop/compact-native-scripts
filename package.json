@@ -7,6 +7,7 @@
   "scripts": {
     "start": "tsx src/cli.ts",
     "build": "tsc",
+    "compact": "compact compile generated/Warden.compact ./generated/managed/warden",
     "clean": "rm -rf dist generated tsconfig.tsbuildinfo",
     "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",

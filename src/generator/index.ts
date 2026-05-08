@@ -25,7 +25,7 @@ pragma language_version ${languageVersion};
  * @description ${MODULE_DESCRIPTION}
 ${MODULE_EXTRA_COMMENTS}
  */
-export module Warden {
+module Warden {
   import CompactStandardLibrary;
 
   /**

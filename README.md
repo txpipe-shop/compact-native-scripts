@@ -7,16 +7,30 @@ The idea is that the CLI generates a Compact contract module that can be used to
 - `verify` is used within a circuit to ensure that it will be run if and only if the set of commitments present satisfies the predefined assertions.
 The predefined assertions are constructed based on Cardano native scripts.
 
+## Prerequisites
+
+- compact 0.4.0
+- pnpm 10.30.1
+
 ## Usage
+
 ```bash
+pnpm install
 pnpm start -i <input-file>
 ```
 
-Generates a Compact contract module from a JSON input file. The input file
-defines the script tree (commitment hashes, composite conditions, time locks)
+Generates a Compact contract module from a JSON input file. The input file defines the script tree (commitment hashes, composite conditions, time locks)
 following the schema documented below.
 
 Output is written to generated/Warden.compact.
+
+### Compile
+
+```bash
+pnpm compact
+```
+
+Compiles the generated Compact code and writes the artifacts into generated/managed.
 
 ## Documentation
 
