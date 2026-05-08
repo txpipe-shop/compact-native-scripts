@@ -7,6 +7,7 @@ export function generateCompact(
   script: NativeScriptSchema,
   languageVersion: string = '0.22.0'
 ): string {
+  const initBody = '';
   const commitBody = '';
   const verifyBody = '';
 
@@ -24,12 +25,51 @@ pragma language_version ${languageVersion};
  * @description ${MODULE_DESCRIPTION}
 ${MODULE_EXTRA_COMMENTS}
  */
-module Warden {
+export module Warden {
   import CompactStandardLibrary;
 
+  /**
+   * @description Store the IDs to which each committment has to be added.
+   * @key commitment hash
+   * @value set of IDs
+   */
+  export ledger commitmentsToIds: Map<Bytes<32>, Set<Bytes<16>>>;
+
+  /**
+   * @description Store commitments.
+   * @key hash id of the set
+   * @value set of commitments
+   */
+  export ledger idsToCommitments: Map<Bytes<16>, Set<Bytes<32>>>;
+
+  /**
+   * @description Witness function to fetch a secret from the wallet.
+   * This secret will be used to obtain the commitment.
+   */
+  witness localSecret(): Bytes<32>;
+
+  /**
+   * @description Initialize state. Constructors are not available within
+   * modules, so this circuit has to be called from the overall program's
+   * top level constructor.
+   */
+  export circuit init(): [] {${formatCircuit(initBody)}
+  }
+
+  /**
+   * @description Add a commitment if it is authorized (member of
+   * commitmentsToIds).
+   */
   export circuit commit(): [] {${formatCircuit(commitBody)}
   }
 
+  /**
+   * @description Checks that the commitments currently present satisfy the
+   * predefined conditions.
+   *
+   * @notice this is the access-control entry point that the application
+   * has to call before execution.
+   */
   export circuit verify(): [] {${formatCircuit(verifyBody)}
   }
 }`;
