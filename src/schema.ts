@@ -4,12 +4,13 @@ import { fromHex } from '@midnight-ntwrk/compact-runtime';
 /**
  * Union of all valid script types for recursive schema
  */
-type BaseScript = { type: 'cmt', hash: Uint8Array }
-  | { type: 'after', block: number }
-  | { type: 'before', block: number }
-  | { type: 'any', scripts: BaseScript[] }
-  | { type: 'all', scripts: BaseScript[] }
-  | { type: 'atLeast', required: number, scripts: BaseScript[] };
+type BaseScript =
+  | { type: 'cmt'; hash: Uint8Array }
+  | { type: 'after'; block: number }
+  | { type: 'before'; block: number }
+  | { type: 'any'; scripts: BaseScript[] }
+  | { type: 'all'; scripts: BaseScript[] }
+  | { type: 'atLeast'; required: number; scripts: BaseScript[] };
 
 const Uint8ArraySchema = z
   .union([

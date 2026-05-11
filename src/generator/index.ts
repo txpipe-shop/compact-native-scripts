@@ -1,7 +1,8 @@
 import type { NativeScriptSchema } from '../index.js';
 
 const MODULE_DESCRIPTION = 'A contract library.';
-const MODULE_EXTRA_COMMENTS = ' * Provides a mechanism to grant access to a circuit based on a set of commitments.';
+const MODULE_EXTRA_COMMENTS =
+  ' * Provides a mechanism to grant access to a circuit based on a set of commitments.';
 
 export function generateCompact(
   script: NativeScriptSchema,
