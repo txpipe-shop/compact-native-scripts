@@ -12,7 +12,9 @@
     "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +30,8 @@
     "tsx": "^4.21.0",
     "turbo": "^2.8.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.29.0"
+    "typescript-eslint": "^8.29.0",
+    "vitest": "^4.1.6"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "0.16.0",
