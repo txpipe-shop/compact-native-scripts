@@ -1,14 +1,20 @@
 {
   "name": "compact-native-scripts",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "start": "tsx src/cli.ts",
+    "build": "tsc",
+    "compact": "compact compile generated/Warden.compact ./generated/managed/warden",
+    "clean": "rm -rf dist generated tsconfig.tsbuildinfo",
     "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -24,10 +30,12 @@
     "tsx": "^4.21.0",
     "turbo": "^2.8.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.29.0"
+    "typescript-eslint": "^8.29.0",
+    "vitest": "^4.1.6"
   },
   "dependencies": {
-    "zod": "^4.3.6",
-    "@midnight-ntwrk/compact-runtime": "0.16.0"
+    "@midnight-ntwrk/compact-runtime": "0.16.0",
+    "commander": "^14.0.3",
+    "zod": "^4.3.6"
   }
 }

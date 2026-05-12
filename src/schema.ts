@@ -1,6 +1,17 @@
 import { z } from 'zod';
 import { fromHex } from '@midnight-ntwrk/compact-runtime';
 
+/**
+ * Union of all valid script types for recursive schema
+ */
+type BaseScript =
+  | { type: 'cmt'; hash: Uint8Array }
+  | { type: 'after'; block: number }
+  | { type: 'before'; block: number }
+  | { type: 'any'; scripts: BaseScript[] }
+  | { type: 'all'; scripts: BaseScript[] }
+  | { type: 'atLeast'; required: number; scripts: BaseScript[] };
+
 const Uint8ArraySchema = z
   .union([
     z.instanceof(Uint8Array),
@@ -15,13 +26,13 @@ export type Uint8ArraySchema = z.infer<typeof Uint8ArraySchema>;
 /**
  * Commitment clause (leaf, signature-equivalent)
  */
-const CommmitmentSchema = z
+const CommitmentSchema = z
   .object({
     type: z.literal('cmt').describe('Commitment verification clause type'),
     hash: Uint8ArraySchema.describe('Commitment hash (32 bytes)'),
   })
   .describe('Commitment clause - signature-equivalent verification against a commitment hash');
-export type CommmitmentSchema = z.infer<typeof CommmitmentSchema>;
+export type CommitmentSchema = z.infer<typeof CommitmentSchema>;
 
 /**
  * Time lock clauses (leaf, no recursion needed)
@@ -92,10 +103,10 @@ export type AtLeastScriptSchema = z.infer<typeof AtLeastScriptSchema>;
 /**
  * Base script schema - includes all types (leaf + composite) for use inside scripts arrays
  */
-const BaseScriptSchema: z.ZodType<unknown> = z.lazy(() =>
+const BaseScriptSchema: z.ZodType<BaseScript> = z.lazy(() =>
   z
     .discriminatedUnion('type', [
-      CommmitmentSchema,
+      CommitmentSchema,
       AfterClauseSchema,
       BeforeClauseSchema,
       AnyScriptSchema,
@@ -116,7 +127,7 @@ export type NativeScriptSchema = z.infer<typeof NativeScriptSchema>;
 
 export {
   Uint8ArraySchema,
-  CommmitmentSchema,
+  CommitmentSchema,
   AfterClauseSchema,
   BeforeClauseSchema,
   AnyScriptSchema,

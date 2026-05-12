@@ -18,6 +18,7 @@ export default tseslint.config(
       '**/*.compact',
       '.turbo/',
       'pnpm-lock.yaml',
+      '__tests__/**',
       // apps/ui has its own eslint config with type-aware rules
       'apps/ui/**',
     ],
@@ -29,7 +30,7 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['*.mjs', '*.cjs', '*.js'],
+          allowDefaultProject: ['*.mjs', '*.cjs', '*.js', 'vitest.config.ts'],
           defaultProject: path.join(__dirname, 'tsconfig.base.json'),
         },
         tsconfigRootDir: __dirname,
