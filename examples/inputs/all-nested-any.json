@@ -1,0 +1,30 @@
+{
+  "type": "all",
+  "scripts": [
+    {
+      "type": "cmt",
+      "hash": "21f314e3679165f234fe8a986f60d2a0308e4b846415fe68f4bf9d3d194ea74c"
+    },
+    {
+      "type": "any",
+      "scripts": [
+        {
+          "type": "cmt",
+          "hash": "ba660000921e9e4f1d6e178440fc187e28a4eefc7a2a20e90bb75c3d1fa66252"
+        },
+        {
+          "type": "cmt",
+          "hash": "78d6b87a286cea8de00926528df0fb9dd2d0e8de86a4838b303a82ecf19e6a91"
+        },
+        {
+          "type": "cmt",
+          "hash": "25b75103abd3122985dc69e586aea16ca25a90831b69f15d4a38a7559acbd82a"
+        },
+        {
+          "type": "cmt",
+          "hash": "13e29897dcb463d2a6c471694c4643593b7e8b5783631d14fd5ef1e0422ed565"
+        }
+      ]
+    }
+  ]
+}

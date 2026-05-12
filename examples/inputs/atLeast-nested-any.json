@@ -1,0 +1,27 @@
+{
+  "type": "atLeast",
+  "required": 3,
+  "scripts": [
+    {
+      "type": "any",
+      "scripts": [
+        {
+          "type": "cmt",
+          "hash": "bee8dee9fb2da87ae60b650a4582d6b80eebd41dc62bd31446bee9185f991c8a"
+        },
+        {
+          "type": "cmt",
+          "hash": "725bb974e724df4497f9ec262f5bf3859ac6a81949a7e29a6faeb2c72aad8a86"
+        }
+      ]
+    },
+    {
+      "type": "cmt",
+      "hash": "04c8b7c3ba1b9423c3c90efd9138690f7265d053013f6c17ecd4bb8d4420ea9a"
+    },
+    {
+      "type": "cmt",
+      "hash": "926587b6cdbf1c50d6a45be911989b14b2ec7cf4be14dacbce89c2bc4ccfcf6c"
+    }
+  ]
+}
