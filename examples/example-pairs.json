@@ -1,0 +1,102 @@
+[
+  {
+    "secret": "ed192a825b79d3602cd82cdf0c15ad7accfdc06f32bc0062f89a6c09edaf964b",
+    "randomness": "1a0a174c772ee1556bf1b980475eaffe2b4bb8112e82f5348e612b93804405da",
+    "commitment": "21f314e3679165f234fe8a986f60d2a0308e4b846415fe68f4bf9d3d194ea74c"
+  },
+  {
+    "secret": "c7703a18dfeda0af9f0682ef6e60bf521793abc4bc222a5b2ce07c1689711368",
+    "randomness": "f6100395d430cfde21264df287213894cc453d624f41d7c5e2961d5945be4aa0",
+    "commitment": "9517dcb986da18099688e88b6fe1fce568fd0eeb7ddbba86a8263dc489f85783"
+  },
+  {
+    "secret": "530ee83ae300c6b3b594fceedab4f959ab932f60283905b7b89cedac46592454",
+    "randomness": "1d448e83ea309d95bd0815e6d0cbb0a6ef2246724ff6880cc9bb1239e34a62be",
+    "commitment": "da6d42c11f5ca536f413497d8e8ebd3e64d78bdd80e21f5879537d7ea94b1583"
+  },
+  {
+    "secret": "5ce9e1897761894c51485ff5f7b9d2dda95584b7a45950c120041465508bacce",
+    "randomness": "4c7238a7da9094db5b82dd15a350da4b07e01fb23fc804458df7c2c720dac81e",
+    "commitment": "2e9d019799b4d93bf1cc68c8119c154cc4e7f814743f2201b6b7f8a8897b4fe1"
+  },
+  {
+    "secret": "acd09396891a77a861486e0588ff73332dfe2403c29778f993bb1648182f3ed0",
+    "randomness": "43dfa543adfc03a135c0abf07ae8b95d7f76db45c87f5f4a311537fc2ef9ac29",
+    "commitment": "725bb974e724df4497f9ec262f5bf3859ac6a81949a7e29a6faeb2c72aad8a86"
+  },
+  {
+    "secret": "8974d1c6b9b14d30519d231666c8da3deb035a1af6a89ffbf19172ceb2fad053",
+    "randomness": "44d0726e8b642e7ab449a070266cbf11c5e824ecce35c4e9ca2daf9b2306d908",
+    "commitment": "ba660000921e9e4f1d6e178440fc187e28a4eefc7a2a20e90bb75c3d1fa66252"
+  },
+  {
+    "secret": "d399e228d47005e4783ccdbc32f0119ecdffa17e315eb58fef69888160f3bac5",
+    "randomness": "9eefc2fea42040b9328632b9414a28572147e2f36c466a5ea145e5bd44e26f33",
+    "commitment": "78d6b87a286cea8de00926528df0fb9dd2d0e8de86a4838b303a82ecf19e6a91"
+  },
+  {
+    "secret": "06f5ca83643e9acadbeea9ba1f8a8a64d692f248d110d3df345a7e48888b7d93",
+    "randomness": "3b1bb2ca83dbfd86b0e183a1c535a8ca850536ce20ee8694b63b78dda2e83a04",
+    "commitment": "25b75103abd3122985dc69e586aea16ca25a90831b69f15d4a38a7559acbd82a"
+  },
+  {
+    "secret": "a84fc7dcffad4f2d9d1bd910806e4d6d0d5b7ebfa33281e0185150217c42b57b",
+    "randomness": "a93b084acf93d54770c46fe17e60e4541dcf7a1b3d95fa94add37a51c32c5c21",
+    "commitment": "13e29897dcb463d2a6c471694c4643593b7e8b5783631d14fd5ef1e0422ed565"
+  },
+  {
+    "secret": "84ecdeb911e0197545c2ff1db9a621fa5610417973990c65dad3ddd20428a491",
+    "randomness": "51a05f20d6b333e68cd91f27a16ef0f57d694b84626eb388d125d63b3e35eb05",
+    "commitment": "c64cc99262310c372db285c5d173a1ccf8d81ee571cf6aaa21a55e6e2e35c352"
+  },
+  {
+    "secret": "c4fc4af031b3945ee6c35eabacf027d7dfb2f14951b5cc67e7be88d5dee9347c",
+    "randomness": "b6e41f46b5d1b464fb8b1be296fc8d632afc774902690e10af7b771a853db310",
+    "commitment": "74e084e4af59297a23511ff1d1e4f51665cec78ae26428338a67eb9278d78715"
+  },
+  {
+    "secret": "f9a3ac221114084ef4cdc45c471816ac1c0fc272d7afcd3c5113d0ab932d2737",
+    "randomness": "bed58dde9b17cc385a21672f5d5160effa4754d416573ecc95c35f651823144b",
+    "commitment": "23531f33c3b9fb790a40cc2dd31a1bc562a3e214ba843d03e0e613f1f3b07fd9"
+  },
+  {
+    "secret": "a03b8bc814dc42784419f73713f199615e97d16946dd6aa835ca3583e5fef1e3",
+    "randomness": "f9bc97f8bb18a75cec870c1b9ed04898c1f6fe47fa13aec8502db1b9854fbe6f",
+    "commitment": "7af0d79f2936593051b77ac6fd8026f2923dbaecf8ae25cfa245db1cf8a3a5ce"
+  },
+  {
+    "secret": "44b8d36317553c70ab8d6655bfbe034c5867f56624b0c2d5ac48b17e179e33fa",
+    "randomness": "d957b921de071a4de1ae74763debde576d8bb6c0e28c2c862d8cb94eee8270d1",
+    "commitment": "926587b6cdbf1c50d6a45be911989b14b2ec7cf4be14dacbce89c2bc4ccfcf6c"
+  },
+  {
+    "secret": "c74078186d0b17849a3eca77e2dfa8b2747de60f7de70b59b65908b5e20016bf",
+    "randomness": "95033ee9171e1bedfb043d54d8999629fbead19455332078e98af4c6c645fe89",
+    "commitment": "bee8dee9fb2da87ae60b650a4582d6b80eebd41dc62bd31446bee9185f991c8a"
+  },
+  {
+    "secret": "dd1ba85f0ce97b2efcac959bac6abe084fb39d5ecbc71e28c15a728ba6681637",
+    "randomness": "2dba73651094ffcaa7e28d5e1e2eb3a8884425c29159d764990424d0dd024be8",
+    "commitment": "04c8b7c3ba1b9423c3c90efd9138690f7265d053013f6c17ecd4bb8d4420ea9a"
+  },
+  {
+    "secret": "079a3e53999fdbfe3e6c3e194bfad1a6eef0a2abfa749747b5228365d48da8e1",
+    "randomness": "881e0b45545fc7b16213dc40d1b382bd7e2b023ff91de1bbf931c5518881d0ce",
+    "commitment": "12f5821d63b30642f8f75dc9694cc33620a20104c62a886b89ecd29b4c8343af"
+  },
+  {
+    "secret": "36cf8d5f34f16f2e23105e0905572474a91f48478c12876ac7b9ba297887bd5f",
+    "randomness": "bee8802713c7a17cd83ca68546ca43f6ff97237244054caca7a5d343e86ddb60",
+    "commitment": "6fdb14f712f93813edf7fece303d60d9239f70b21d594dd791d4c776d31c084d"
+  },
+  {
+    "secret": "220005f2a1b04319d8269a8b74681372df1a5999d9ac445b80434bf6b33a096b",
+    "randomness": "8f6bb174cb82e1505672d8b03fdf3dd5e84260b6e4633c95dc1e91f666efb8a2",
+    "commitment": "d5e7184b811f179e8b5662511bef2be2f22584870c1f34e8aac90f94dfee52d4"
+  },
+  {
+    "secret": "ac0add0cbbbaff8c5927a633ec801295ca116e513b97b2d13cd6eac12f9c3a52",
+    "randomness": "1122f53e90e5f2dcd61accb504c6fb70114009e53112141f02bab55462e06f4b",
+    "commitment": "8954876f9030dba9110149dfac22b5333dd2b9abb0316dcee20ca0af4dccadd7"
+  }
+]

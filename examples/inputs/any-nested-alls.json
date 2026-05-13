@@ -1,0 +1,35 @@
+{
+  "type": "any",
+  "scripts": [
+    {
+      "type": "all",
+      "scripts": [
+        {
+          "type": "cmt",
+          "hash": "926587b6cdbf1c50d6a45be911989b14b2ec7cf4be14dacbce89c2bc4ccfcf6c"
+        },
+        {
+          "type": "cmt",
+          "hash": "25b75103abd3122985dc69e586aea16ca25a90831b69f15d4a38a7559acbd82a"
+        },
+        {
+          "type": "cmt",
+          "hash": "23531f33c3b9fb790a40cc2dd31a1bc562a3e214ba843d03e0e613f1f3b07fd9"
+        }
+      ]
+    },
+    {
+      "type": "all",
+      "scripts": [
+        {
+          "type": "cmt",
+          "hash": "74e084e4af59297a23511ff1d1e4f51665cec78ae26428338a67eb9278d78715"
+        },
+        {
+          "type": "cmt",
+          "hash": "6fdb14f712f93813edf7fece303d60d9239f70b21d594dd791d4c776d31c084d"
+        }
+      ]
+    }
+  ]
+}

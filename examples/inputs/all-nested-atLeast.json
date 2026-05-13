@@ -1,0 +1,43 @@
+{
+  "type": "all",
+  "scripts": [
+    {
+      "type": "cmt",
+      "hash": "21f314e3679165f234fe8a986f60d2a0308e4b846415fe68f4bf9d3d194ea74c"
+    },
+    {
+      "type": "cmt",
+      "hash": "9517dcb986da18099688e88b6fe1fce568fd0eeb7ddbba86a8263dc489f85783"
+    },
+    {
+      "type": "atLeast",
+      "required": 3,
+      "scripts": [
+        {
+          "type": "cmt",
+          "hash": "926587b6cdbf1c50d6a45be911989b14b2ec7cf4be14dacbce89c2bc4ccfcf6c"
+        },
+        {
+          "type": "cmt",
+          "hash": "bee8dee9fb2da87ae60b650a4582d6b80eebd41dc62bd31446bee9185f991c8a"
+        },
+        {
+          "type": "cmt",
+          "hash": "04c8b7c3ba1b9423c3c90efd9138690f7265d053013f6c17ecd4bb8d4420ea9a"
+        },
+        {
+          "type": "cmt",
+          "hash": "12f5821d63b30642f8f75dc9694cc33620a20104c62a886b89ecd29b4c8343af"
+        },
+        {
+          "type": "cmt",
+          "hash": "6fdb14f712f93813edf7fece303d60d9239f70b21d594dd791d4c776d31c084d"
+        },
+        {
+          "type": "cmt",
+          "hash": "d5e7184b811f179e8b5662511bef2be2f22584870c1f34e8aac90f94dfee52d4"
+        }
+      ]
+    }
+  ]
+}
