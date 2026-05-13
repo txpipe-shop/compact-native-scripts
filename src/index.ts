@@ -11,3 +11,5 @@ export {
 } from './schema.js';
 
 export { generateCompact } from './generator/index.js';
+export { generateSecretPair, generateCommitment } from './pair.js';
+export type { SecretPair } from './pair.js';
