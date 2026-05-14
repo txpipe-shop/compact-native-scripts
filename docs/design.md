@@ -7,7 +7,7 @@ In this document we'll describe the design for the Compact module code that the 
 ### `language version`
 
 Every Compact contract starts with the `pragma` keyword to declare a constraint on the either the compiler or language version.
-The generated Compact utilizes the `language_version` constraint and the version number is an optional parameter of the generator with the current latest as default.
+The generated Compact utilizes the `language_version` constraint and the version number is an optional parameter of the generator with the current latest version as default.
 
 ### `module Warden`
 
@@ -30,7 +30,7 @@ A single commitment hash may map to multiple set IDs if it appears as a child of
 
 ### Witness
 
-The witness function `localSecret` aims to obtain a secret `Bytes<32>` value from the wallet. This value will be used to hash the commitment that will be stored, so it shouldn't change.
+The witness function `localSecret` fetches a secret `Bytes<32>` value from the wallet, and `randomness` fetches a specific random `Bytes<32>` value that was used when generating the initial commitment. These values will be used to recompute the commitment at execution time.
 
 ### Circuits
 

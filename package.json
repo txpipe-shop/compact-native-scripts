@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsx src/cli.ts",
+    "generate-code": "tsx src/cli.ts generate-code",
+    "make-commitment": "tsx src/cli.ts make-commitment",
     "build": "tsc",
     "compact": "compact compile generated/Warden.compact ./generated/managed/warden",
     "clean": "rm -rf dist generated tsconfig.tsbuildinfo",

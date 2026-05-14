@@ -13,11 +13,20 @@ The idea is that the CLI generates a Compact contract module that can be used to
 - compact 0.4.0
 - pnpm 10.30.1
 
-## Usage
+## Setup
+
+Install dependencies
 
 ```bash
 pnpm install
-pnpm start -i <input-file>
+```
+
+## Usage
+
+### Compact code generator
+
+```bash
+pnpm generate-code -i <input-file>
 ```
 
 Generates a Compact contract module from a JSON input file. The input file defines the script tree (commitment hashes, composite conditions, time locks)
@@ -25,13 +34,25 @@ following the schema documented below.
 
 Output is written to generated/Warden.compact.
 
+### Commitment generator
+
+```bash
+pnpm make-commitment -s <seed_hex> -o <output-file>
+```
+
+Generates a SecretPair comprised of a `secret` and a `randomness`, and the corresponding `commitment` product of these two.
+Optional parameters are:
+- -s, --seed <hex>     64-character hex seed for the secret
+- -o, --output <path>  Path to write the result as JSON
+
+
 ### Compile
 
 ```bash
 pnpm compact
 ```
 
-Compiles the generated Compact code and writes the artifacts into generated/managed.
+Compiles the generated Compact code and writes the artifacts into `generated/managed`.
 
 ### Test
 
@@ -39,7 +60,7 @@ Compiles the generated Compact code and writes the artifacts into generated/mana
 pnpm test
 ```
 
-Runs the test suite with Vitest.
+Runs the test suite with Vitest (compact code must be generated and compiled before running the tests).
 
 ## Documentation
 
