@@ -42,9 +42,9 @@ pnpm make-commitment -s <seed_hex> -o <output-file>
 
 Generates a SecretPair comprised of a `secret` and a `randomness`, and the corresponding `commitment` product of these two.
 Optional parameters are:
-- -s, --seed <hex>     64-character hex seed for the secret
-- -o, --output <path>  Path to write the result as JSON
 
+- -s, --seed <hex> 64-character hex seed for the secret
+- -o, --output <path> Path to write the result as JSON
 
 ### Compile
 
