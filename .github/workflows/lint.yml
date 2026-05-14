@@ -27,8 +27,8 @@ jobs:
       - name: Install Compact compiler
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
-          echo "$HOME/.compact/bin" >> $GITHUB_PATH
-          compact update
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          compact update 0.30.0
 
       - name: Check formatting
         run: pnpm run format:check
