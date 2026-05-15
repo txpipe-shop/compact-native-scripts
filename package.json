@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsx src/cli.ts",
+    "generate-code": "tsx src/cli.ts generate-code",
+    "make-commitment": "tsx src/cli.ts make-commitment",
     "build": "tsc",
     "compact": "compact compile generated/Warden.compact ./generated/managed/warden",
     "clean": "rm -rf dist generated tsconfig.tsbuildinfo",
@@ -13,6 +14,7 @@
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "pretest": "tsx src/cli.ts generate-code -i examples/test-input.json && pnpm compact",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -34,7 +36,7 @@
     "vitest": "^4.1.6"
   },
   "dependencies": {
-    "@midnight-ntwrk/compact-runtime": "0.16.0",
+    "@midnight-ntwrk/compact-runtime": "0.15.0",
     "commander": "^14.0.3",
     "zod": "^4.3.6"
   }

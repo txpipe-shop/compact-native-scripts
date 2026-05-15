@@ -50,6 +50,19 @@ module Warden {
   witness localSecret(): Bytes<32>;
 
   /**
+   * @description Witness function to fetch the randomness that along with a secret
+   * generates a specific commitment.
+   */
+  witness randomness(): Bytes<32>;
+
+  /**
+   * @description Generates the commitment that will be added into the idsToCommitments ledger.
+   */
+  export pure circuit getCommitment(secret: Bytes<32>, randomness: Bytes<32>): Bytes<32> {
+    return persistentCommit<Bytes<32>>(secret, randomness);
+  }
+
+  /**
    * @description Initialize state. Constructors are not available within
    * modules, so this circuit has to be called from the overall program's
    * top level constructor.
@@ -73,5 +86,11 @@ module Warden {
    */
   export circuit verify(): [] {${formatCircuit(verifyBody)}
   }
-}`;
+}
+
+import Warden;
+
+export { getCommitment, init, commit, verify };
+
+`;
 }
