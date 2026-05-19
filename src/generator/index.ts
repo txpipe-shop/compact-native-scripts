@@ -1,5 +1,5 @@
 import type { NativeScriptSchema } from '../index.js';
-import { initCircuitBody } from './init.js';
+import { initCircuitBody, collectCmtLeaves } from './init.js';
 
 const MODULE_DESCRIPTION = 'A contract library.';
 const MODULE_EXTRA_COMMENTS =
@@ -91,7 +91,9 @@ module Warden {
 
 import Warden;
 
-export { getCommitment, init, commit, verify };
+export { getCommitment, init, commit, verify, idsToCommitments, commitmentsToIds };
 
 `;
 }
+
+export { collectCmtLeaves };
