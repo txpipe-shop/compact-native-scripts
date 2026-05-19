@@ -1,4 +1,5 @@
 import type { NativeScriptSchema } from '../index.js';
+import { initCircuitBody } from './init.js';
 
 const MODULE_DESCRIPTION = 'A contract library.';
 const MODULE_EXTRA_COMMENTS =
@@ -8,13 +9,13 @@ export function generateCompact(
   script: NativeScriptSchema,
   languageVersion: string = '0.22.0'
 ): string {
-  const initBody = '';
+  const initBody = initCircuitBody(script);
   const commitBody = '';
   const verifyBody = '';
 
   const formatCircuit = (body: string) => {
     if (!body.trim()) return '\n';
-    return '\n    ' + body.split('\n').join('\n    ') + '\n  ';
+    return '\n    ' + body.trimEnd().split('\n').join('\n    ');
   };
 
   return `// Compact Native Script Contract (access/Warden.compact)
@@ -34,14 +35,14 @@ module Warden {
    * @key commitment hash
    * @value set of IDs
    */
-  export ledger commitmentsToIds: Map<Bytes<32>, Set<Bytes<16>>>;
+  export ledger commitmentsToIds: Map<Bytes<32>, Set<Bytes<8>>>;
 
   /**
    * @description Store commitments.
    * @key hash id of the set
    * @value set of commitments
    */
-  export ledger idsToCommitments: Map<Bytes<16>, Set<Bytes<32>>>;
+  export ledger idsToCommitments: Map<Bytes<8>, Set<Bytes<32>>>;
 
   /**
    * @description Witness function to fetch a secret from the wallet.
