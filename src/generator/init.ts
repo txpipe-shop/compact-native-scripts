@@ -72,15 +72,20 @@ export function initCircuitBody(schema: NativeScriptSchema): string {
       return map;
     }, new Map<string, string[]>());
 
-  return Array.from(cmtToIds)
-    .map(([cmt, paths]) => {
-      const hash_bytes = Buffer.from(cmt, 'hex').toJSON().data.join(', ');
-      return (
-        `commitmentsToIds.insert(Bytes[${hash_bytes}], default<Set<Bytes<8>>>);\n` +
-        paths
-          .map((path) => `commitmentsToIds.lookup(Bytes[${hash_bytes}]).insert(${path});\n`)
-          .join('')
-      );
-    })
-    .join('');
+  const assertion = `assert(commitmentsToIds.isEmpty(), 'Init circuit has already been called');\n`;
+
+  return (
+    assertion +
+    Array.from(cmtToIds)
+      .map(([cmt, paths]) => {
+        const hash_bytes = Buffer.from(cmt, 'hex').toJSON().data.join(', ');
+        return (
+          `commitmentsToIds.insert(Bytes[${hash_bytes}], default<Set<Bytes<8>>>);\n` +
+          paths
+            .map((path) => `commitmentsToIds.lookup(Bytes[${hash_bytes}]).insert(${path});\n`)
+            .join('')
+        );
+      })
+      .join('')
+  );
 }

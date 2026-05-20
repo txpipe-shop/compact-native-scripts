@@ -25,4 +25,10 @@ describe('Init circuit', () => {
       expect(updatedLedger.commitmentsToIds.lookup(hash).isEmpty()).toBeFalsy()
     );
   });
+
+  it('double init throws', () => {
+    const sim = new WardenSimulator();
+    sim.init();
+    expect(() => sim.init()).toThrow('Init circuit has already been called');
+  });
 });
