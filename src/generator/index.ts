@@ -1,5 +1,6 @@
 import type { NativeScriptSchema } from '../index.js';
-import { initCircuitBody, collectCmtLeaves } from './init.js';
+import { initCircuitBody } from './init.js';
+import { collectCmtLeaves } from './utils.js';
 
 const MODULE_DESCRIPTION = 'A contract library.';
 const MODULE_EXTRA_COMMENTS =
@@ -9,7 +10,8 @@ export function generateCompact(
   script: NativeScriptSchema,
   languageVersion: string = '0.22.0'
 ): string {
-  const initBody = initCircuitBody(script);
+  const cmtLeaves = collectCmtLeaves(script);
+  const initBody = initCircuitBody(cmtLeaves);
   const commitBody = '';
   const verifyBody = '';
 

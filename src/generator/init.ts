@@ -1,59 +1,6 @@
-import { NativeScriptSchema } from '../index.js';
+import { CmtLeaf } from './utils.js';
 
-export type CmtLeaf = {
-  hashes: Uint8Array[];
-  path: string;
-};
-
-export function collectCmtLeaves(script: NativeScriptSchema): CmtLeaf[] {
-  switch (script.type) {
-    case 'cmt':
-      return [{ hashes: [script.hash], path: '0' }];
-    case 'after':
-    case 'before':
-      return [];
-    case 'any':
-    case 'all':
-    case 'atLeast':
-      return collectFromComposite(script, '0');
-  }
-}
-
-function collectFromComposite(
-  script: Extract<NativeScriptSchema, { type: 'any' | 'all' | 'atLeast' }>,
-  path: string
-): CmtLeaf[] {
-  const directCmts: Uint8Array[] = [];
-  const nested: CmtLeaf[] = [];
-
-  for (let i = 0; i < script.scripts.length; i++) {
-    const child = script.scripts[i];
-    switch (child.type) {
-      case 'cmt':
-        directCmts.push(child.hash);
-        break;
-      case 'after':
-      case 'before':
-        break;
-      case 'any':
-      case 'all':
-      case 'atLeast':
-        nested.push(...collectFromComposite(child, path ? `${path}.${i}` : `${i}`));
-        break;
-    }
-  }
-
-  const result: CmtLeaf[] = [];
-  if (directCmts.length > 0) {
-    result.push({ hashes: directCmts, path });
-  }
-  result.push(...nested);
-  return result;
-}
-
-export function initCircuitBody(schema: NativeScriptSchema): string {
-  const leaves = collectCmtLeaves(schema);
-
+export function initCircuitBody(leaves: CmtLeaf[]): string {
   const cmtToIds = leaves
     .flatMap((leaf) =>
       leaf.hashes.map((hash) => ({
@@ -72,7 +19,9 @@ export function initCircuitBody(schema: NativeScriptSchema): string {
       return map;
     }, new Map<string, string[]>());
 
-  const assertion = `assert(commitmentsToIds.isEmpty(), 'Init circuit has already been called');\n`;
+  const assertion = `assert(commitmentsToIds.isEmpty(), "Init circuit has already been called");\n`;
+
+  const uniquePaths = [...new Set(leaves.map((leaf) => leaf.path))];
 
   return (
     assertion +
@@ -80,11 +29,17 @@ export function initCircuitBody(schema: NativeScriptSchema): string {
       .map(([cmt, paths]) => {
         const hash_bytes = Buffer.from(cmt, 'hex').toJSON().data.join(', ');
         return (
-          `commitmentsToIds.insert(Bytes[${hash_bytes}], default<Set<Bytes<8>>>);\n` +
+          `commitmentsToIds.insertDefault(Bytes[${hash_bytes}]);\n` +
           paths
             .map((path) => `commitmentsToIds.lookup(Bytes[${hash_bytes}]).insert(${path});\n`)
             .join('')
         );
+      })
+      .join('') +
+    Array.from(uniquePaths)
+      .map((path) => {
+        const pathBytes = Buffer.from(path.padEnd(8)).toJSON().data.join(', ');
+        return `idsToCommitments.insertDefault(Bytes[${pathBytes}]);\n`;
       })
       .join('')
   );
