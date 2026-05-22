@@ -1,4 +1,5 @@
 import type { NativeScriptSchema } from '../index.js';
+import { commitCircuitBody } from './commit.js';
 import { initCircuitBody } from './init.js';
 import { collectCmtLeaves } from './utils.js';
 
@@ -12,7 +13,7 @@ export function generateCompact(
 ): string {
   const cmtLeaves = collectCmtLeaves(script);
   const initBody = initCircuitBody(cmtLeaves);
-  const commitBody = '';
+  const commitBody = commitCircuitBody(cmtLeaves);
   const verifyBody = '';
 
   const formatCircuit = (body: string) => {
@@ -77,7 +78,11 @@ module Warden {
    * @description Add a commitment if it is authorized (member of
    * commitmentsToIds).
    */
-  export circuit commit(): [] {${formatCircuit(commitBody)}
+  export circuit commit(): [] {
+    assert(!commitmentsToIds.isEmpty(), "Cannot commit to uninitialized contract");
+    const commitment = getCommitment(localSecret(), randomness());
+    assert(commitmentsToIds.member(commitment), "This key is not authorized to commit in this contract");
+    assert(!commitmentsToIds.lookup(commitment).isEmpty(), "Commitment ID set is empty");${formatCircuit(commitBody)}
   }
 
   /**
