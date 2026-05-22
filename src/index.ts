@@ -10,6 +10,6 @@ export {
   type Uint8ArraySchema,
 } from './schema.js';
 
-export { generateCompact } from './generator/index.js';
+export { generateCompact, collectCmtLeaves } from './generator/index.js';
 export { generateSecretPair, generateCommitment } from './pair.js';
 export type { SecretPair } from './pair.js';
