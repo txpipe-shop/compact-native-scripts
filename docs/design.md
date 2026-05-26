@@ -42,7 +42,6 @@ This circuit initializes the ledger for the module. For each commitment hash, `c
 
 This circuit adds a users commitment to the contract's ledger. This aims to mimic the behavior of a multisignature script in which each wallet adds their signature to a transaction. The circuit checks a commitment against the ledger's `commitmentsToIds`: if it belongs, it adds the commitment to the respective sets in `idsToCommitments`, if it doesn't, the commitment wasn't authorized and nothing is added.
 
-
 ##### `getCommitment circuit`
 
 This circuit generates a commitment based on a given secret and randomness. It is used by the `commit` circuit to create the commitment that will be stored on the ledger.

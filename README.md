@@ -63,6 +63,7 @@ pnpm test
 It generates the code, compiles it and runs the test suite with Vitest. The default command uses `all-5` from the [examples/inputs](./examples/inputs/) as the input to generate the code.
 
 To use another example, the command must be run like:
+
 ```bash
 TEST_INPUT=examples/inputs/<example.json> pnpm test
 ```
