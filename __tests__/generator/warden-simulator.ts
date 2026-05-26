@@ -34,6 +34,11 @@ export class WardenSimulator {
     return ledger(this.circuitContext.currentQueryContext.state);
   }
 
+  commit(): Ledger {
+    this.circuitContext = this.contract.impureCircuits.commit(this.circuitContext).context;
+    return ledger(this.circuitContext.currentQueryContext.state);
+  }
+
   getLedger(): Ledger {
     return ledger(this.circuitContext.currentQueryContext.state);
   }
