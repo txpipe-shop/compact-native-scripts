@@ -60,7 +60,12 @@ Compiles the generated Compact code and writes the artifacts into `generated/man
 pnpm test
 ```
 
-Runs the test suite with Vitest (compact code must be generated and compiled before running the tests).
+It generates the code, compiles it and runs the test suite with Vitest. The default command uses `all-5` from the [examples/inputs](./examples/inputs/) as the input to generate the code.
+
+To use another example, the command must be run like:
+```bash
+TEST_INPUT=examples/inputs/<example.json> pnpm test
+```
 
 ## Documentation
 
