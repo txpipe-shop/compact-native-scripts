@@ -5,7 +5,7 @@ export default defineConfig({
     globals: true,
     include: ['__tests__/**/*.test.ts'],
     env: {
-      TEST_INPUT: process.env.TEST_INPUT || 'examples/test-input.json',
+      TEST_INPUT: process.env.TEST_INPUT || 'examples/inputs/all-5.json',
     },
   },
 });
