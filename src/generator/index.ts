@@ -9,7 +9,7 @@ const MODULE_EXTRA_COMMENTS =
 
 export function generateCompact(
   script: NativeScriptSchema,
-  languageVersion: string = '0.22.0'
+  languageVersion: string = '0.23.0'
 ): string {
   const cmtLeaves = collectCmtLeaves(script);
   const initBody = initCircuitBody(cmtLeaves);

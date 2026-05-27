@@ -10,8 +10,9 @@ The idea is that the CLI generates a Compact contract module that can be used to
 
 ## Prerequisites
 
-- compact 0.4.0
-- pnpm 10.30.1
+- Compact Devtools 0.4.0 (check with `compact --version`)
+- Compact Toolchain 0.31.0 (check with `compact compile --version`)
+- PNPM 10.30.1
 
 ## Setup
 
