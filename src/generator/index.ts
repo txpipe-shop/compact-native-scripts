@@ -2,6 +2,7 @@ import type { NativeScriptSchema } from '../index.js';
 import { commitCircuitBody } from './commit.js';
 import { initCircuitBody } from './init.js';
 import { collectCmtLeaves } from './utils.js';
+import { verifyCircuitBody } from './verify.js';
 
 const MODULE_DESCRIPTION = 'A contract library.';
 const MODULE_EXTRA_COMMENTS =
@@ -14,7 +15,7 @@ export function generateCompact(
   const cmtLeaves = collectCmtLeaves(script);
   const initBody = initCircuitBody(cmtLeaves);
   const commitBody = commitCircuitBody(cmtLeaves);
-  const verifyBody = '';
+  const verifyBody = verifyCircuitBody(script, cmtLeaves);
 
   const formatCircuit = (body: string) => {
     if (!body.trim()) return '\n';
