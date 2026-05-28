@@ -10,7 +10,7 @@ const cmtHashes = cmtLeaves.flatMap((leaf) => leaf.hashes);
 const secretPairs = JSON.parse(readFileSync('examples/example-pairs.json', 'utf-8'));
 
 const cmtHexSet = new Set(cmtHashes.map((h) => Buffer.from(h).toString('hex')));
-const matchingPairs = secretPairs.filter((p) => cmtHexSet.has(p.commitment));
+const matchingPairs = secretPairs.filter((p: any) => cmtHexSet.has(p.commitment));
 
 describe('Commit circuit', () => {
   it('prevents double commit of the same pair', () => {
