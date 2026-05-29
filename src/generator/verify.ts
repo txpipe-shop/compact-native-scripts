@@ -6,10 +6,7 @@ function combinations<T>(arr: T[], k: number): T[][] {
   if (k === 0) return [[]];
   if (arr.length < k) return [];
   const [first, ...rest] = arr;
-  return [
-    ...combinations(rest, k - 1).map((c) => [first, ...c]),
-    ...combinations(rest, k),
-  ];
+  return [...combinations(rest, k - 1).map((c) => [first, ...c]), ...combinations(rest, k)];
 }
 
 type GenResult = {

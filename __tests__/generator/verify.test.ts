@@ -7,7 +7,9 @@ import { WardenSimulator } from './warden-simulator.js';
 const input = NativeScriptSchema.parse(JSON.parse(readFileSync(process.env.TEST_INPUT!, 'utf-8')));
 const cmtLeaves = collectCmtLeaves(input);
 const secretPairs = JSON.parse(readFileSync('examples/example-pairs.json', 'utf-8'));
-const cmtHexSet = new Set(cmtLeaves.flatMap((l) => l.hashes).map((h) => Buffer.from(h).toString('hex')));
+const cmtHexSet = new Set(
+  cmtLeaves.flatMap((l) => l.hashes).map((h) => Buffer.from(h).toString('hex'))
+);
 const matchingPairs = secretPairs.filter((p: any) => cmtHexSet.has(p.commitment));
 
 function hasTimeLocks(script: NativeScriptSchema): boolean {
@@ -23,17 +25,20 @@ function hasCmtLeaves(script: NativeScriptSchema): boolean {
 }
 
 describe('Verify circuit', () => {
-  it.runIf(hasCmtLeaves(input) && !hasTimeLocks(input))('passes when all matching commitments are committed', () => {
-    const sim = new WardenSimulator();
-    sim.init();
-    for (const { secret, randomness } of matchingPairs) {
-      sim.commitWith(
-        new Uint8Array(Buffer.from(secret, 'hex')),
-        new Uint8Array(Buffer.from(randomness, 'hex')),
-      );
+  it.runIf(hasCmtLeaves(input) && !hasTimeLocks(input))(
+    'passes when all matching commitments are committed',
+    () => {
+      const sim = new WardenSimulator();
+      sim.init();
+      for (const { secret, randomness } of matchingPairs) {
+        sim.commitWith(
+          new Uint8Array(Buffer.from(secret, 'hex')),
+          new Uint8Array(Buffer.from(randomness, 'hex'))
+        );
+      }
+      expect(() => sim.verify()).not.toThrow();
     }
-    expect(() => sim.verify()).not.toThrow();
-  });
+  );
 
   it('fails on uninitialized contract', () => {
     const sim = new WardenSimulator();
@@ -52,7 +57,7 @@ describe('Verify circuit', () => {
     for (const { secret, randomness } of matchingPairs) {
       sim.commitWith(
         new Uint8Array(Buffer.from(secret, 'hex')),
-        new Uint8Array(Buffer.from(randomness, 'hex')),
+        new Uint8Array(Buffer.from(randomness, 'hex'))
       );
     }
     sim.setBlockTime(1_000_000_000);
@@ -65,24 +70,76 @@ describe('Verify circuit', () => {
     for (const { secret, randomness } of matchingPairs) {
       sim.commitWith(
         new Uint8Array(Buffer.from(secret, 'hex')),
-        new Uint8Array(Buffer.from(randomness, 'hex')),
+        new Uint8Array(Buffer.from(randomness, 'hex'))
       );
     }
     sim.setBlockTime(0);
     expect(() => sim.verify()).toThrow();
   });
 
-  it.runIf(hasCmtLeaves(input) && !hasTimeLocks(input))('fails when not enough commitments are committed', () => {
-    if (matchingPairs.length < 2) return;
-    const { secret, randomness } = matchingPairs[0];
-    const sim = new WardenSimulator(
-      new Uint8Array(Buffer.from(secret, 'hex')),
-      new Uint8Array(Buffer.from(randomness, 'hex')),
-    );
+  it('cleans up idsToCommitments after successful verify', () => {
+    if (!hasCmtLeaves(input)) return;
+    const sim = new WardenSimulator();
     sim.init();
-    sim.commit();
-    if (input.type === 'all' || (input.type === 'atLeast' && input.required > 1)) {
-      expect(() => sim.verify()).toThrow();
+    for (const { secret, randomness } of matchingPairs) {
+      sim.commitWith(
+        new Uint8Array(Buffer.from(secret, 'hex')),
+        new Uint8Array(Buffer.from(randomness, 'hex'))
+      );
+    }
+    if (hasTimeLocks(input)) sim.setBlockTime(1_000_000_000);
+
+    const paths = [...new Set(cmtLeaves.map((l) => l.path))];
+    for (const p of paths) {
+      expect(
+        sim
+          .getLedger()
+          .idsToCommitments.lookup(Buffer.from(p.padEnd(8)))
+          .isEmpty()
+      ).toBe(false);
+    }
+
+    expect(() => sim.verify()).not.toThrow();
+
+    for (const p of paths) {
+      expect(
+        sim
+          .getLedger()
+          .idsToCommitments.lookup(Buffer.from(p.padEnd(8)))
+          .isEmpty()
+      ).toBe(true);
+    }
+  });
+
+  it('leaves idsToCommitments unchanged when verify fails', () => {
+    if (!hasCmtLeaves(input) || !hasTimeLocks(input)) return;
+    const sim = new WardenSimulator();
+    sim.init();
+    for (const { secret, randomness } of matchingPairs) {
+      sim.commitWith(
+        new Uint8Array(Buffer.from(secret, 'hex')),
+        new Uint8Array(Buffer.from(randomness, 'hex'))
+      );
+    }
+
+    const paths = [...new Set(cmtLeaves.map((l) => l.path))];
+    const before: Record<string, string[]> = {};
+    for (const p of paths) {
+      const key = Buffer.from(p.padEnd(8));
+      before[p] = [...sim.getLedger().idsToCommitments.lookup(key)]
+        .map((b: Uint8Array) => Buffer.from(b).toString('hex'))
+        .sort();
+    }
+
+    sim.setBlockTime(0);
+    expect(() => sim.verify()).toThrow();
+
+    for (const p of paths) {
+      const key = Buffer.from(p.padEnd(8));
+      const after = [...sim.getLedger().idsToCommitments.lookup(key)]
+        .map((b: Uint8Array) => Buffer.from(b).toString('hex'))
+        .sort();
+      expect(after).toEqual(before[p]);
     }
   });
 });
