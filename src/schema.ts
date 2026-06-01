@@ -68,7 +68,7 @@ const AnyScriptSchema = z
   .object({
     type: z.literal('any').describe('Any-of script type'),
     scripts: z
-      .lazy(() => z.array(BaseScriptSchema))
+      .lazy(() => z.array(BaseScriptSchema).min(1, 'At least one script is required'))
       .describe('Scripts to evaluate (any one must satisfy)'),
   })
   .describe('Any script - at least one of the contained scripts must be satisfied');
@@ -78,7 +78,7 @@ const AllScriptSchema = z
   .object({
     type: z.literal('all').describe('All-of script type'),
     scripts: z
-      .lazy(() => z.array(BaseScriptSchema))
+      .lazy(() => z.array(BaseScriptSchema).min(1, 'At least one script is required'))
       .describe('Scripts to evaluate (all must satisfy)'),
   })
   .describe('All script - all of the contained scripts must be satisfied');
@@ -94,7 +94,9 @@ const AtLeastScriptSchema = z
       .describe(
         'Minimum number of scripts that must be satisfied, must be equal to or less than the amount of scripts'
       ),
-    scripts: z.lazy(() => z.array(BaseScriptSchema)).describe('Scripts to evaluate'),
+    scripts: z
+      .lazy(() => z.array(BaseScriptSchema).min(1, 'At least one script is required'))
+      .describe('Scripts to evaluate'),
   })
   .refine((obj) => obj.required <= obj.scripts.length)
   .describe('AtLeast script - at least N of the contained scripts must be satisfied');
