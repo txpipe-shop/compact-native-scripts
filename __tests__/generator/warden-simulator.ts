@@ -39,6 +39,26 @@ export class WardenSimulator {
     return ledger(this.circuitContext.currentQueryContext.state);
   }
 
+  commitWith(secret: Uint8Array, randomness: Uint8Array): Ledger {
+    this.circuitContext = {
+      ...this.circuitContext,
+      currentPrivateState: { secret, randomness },
+    };
+    return this.commit();
+  }
+
+  verify(): Ledger {
+    this.circuitContext = this.contract.impureCircuits.verify(this.circuitContext).context;
+    return ledger(this.circuitContext.currentQueryContext.state);
+  }
+
+  setBlockTime(seconds: number): void {
+    this.circuitContext.currentQueryContext.block = {
+      ...this.circuitContext.currentQueryContext.block,
+      secondsSinceEpoch: BigInt(seconds),
+    };
+  }
+
   getLedger(): Ledger {
     return ledger(this.circuitContext.currentQueryContext.state);
   }

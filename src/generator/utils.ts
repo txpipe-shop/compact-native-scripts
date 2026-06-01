@@ -103,7 +103,7 @@ function collectFromComposite(
       case 'any':
       case 'all':
       case 'atLeast':
-        nested.push(...collectFromComposite(child, path ? `${path}.${i}` : `${i}`));
+        nested.push(...collectFromComposite(child, path ? `${path}_${i}` : `${i}`));
         break;
     }
   }

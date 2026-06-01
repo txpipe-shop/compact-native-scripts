@@ -2,19 +2,31 @@ import type { NativeScriptSchema } from '../index.js';
 import { commitCircuitBody } from './commit.js';
 import { initCircuitBody } from './init.js';
 import { collectCmtLeaves } from './utils.js';
+import { verifyCircuitBody } from './verify.js';
 
 const MODULE_DESCRIPTION = 'A contract library.';
 const MODULE_EXTRA_COMMENTS =
   ' * Provides a mechanism to grant access to a circuit based on a set of commitments.';
 
+/**
+ * Generates the complete Compact source code for a Warden native script contract.
+ *
+ * Orchestrates the generation of `init`, `commit`, and `verify` circuits from a
+ * native script input and its commitment leaves, producing a ready-to-compile
+ * Compact module.
+ *
+ * @param script - Native script input describing the access-control policy
+ * @param languageVersion - Compact language version string (default `'0.23.0'`)
+ * @returns Full Compact module source code as a string
+ */
 export function generateCompact(
   script: NativeScriptSchema,
-  languageVersion: string = '0.22.0'
+  languageVersion: string = '0.23.0'
 ): string {
   const cmtLeaves = collectCmtLeaves(script);
   const initBody = initCircuitBody(cmtLeaves);
   const commitBody = commitCircuitBody(cmtLeaves);
-  const verifyBody = '';
+  const verifyBody = verifyCircuitBody(script, cmtLeaves);
 
   const formatCircuit = (body: string) => {
     if (!body.trim()) return '\n';

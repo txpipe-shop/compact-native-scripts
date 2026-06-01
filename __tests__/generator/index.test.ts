@@ -15,7 +15,7 @@ describe('generateCompact', () => {
 
   it('contains the pragma with default language version', () => {
     const result = generateCompact(minimalScript);
-    expect(result).toContain('pragma language_version 0.22.0');
+    expect(result).toContain('pragma language_version 0.23.0');
   });
 
   it('uses the provided language version', () => {
@@ -76,7 +76,7 @@ describe('generateCompact', () => {
       ],
     };
     const result = generateCompact(compositeScript);
-    expect(result).toContain('pragma language_version 0.22.0');
+    expect(result).toContain('pragma language_version 0.23.0');
     expect(result).toContain('module Warden');
   });
 
@@ -97,6 +97,6 @@ describe('generateCompact', () => {
     };
     const result = generateCompact(nestedScript);
     expect(result).toContain('module Warden');
-    expect(result).toContain('pragma language_version 0.22.0');
+    expect(result).toContain('pragma language_version 0.23.0');
   });
 });

@@ -28,7 +28,7 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          compact update 0.30.0
+          compact update 0.31.0
 
       - name: Check formatting
         run: pnpm run format:check
