@@ -7,7 +7,7 @@
   "scripts": {
     "generate-code": "tsx src/cli.ts generate-code",
     "make-commitment": "tsx src/cli.ts make-commitment",
-    "build": "tsc",
+    "build": "tsc && turbo run build",
     "compact": "compact compile generated/Warden.compact ./generated/managed/warden",
     "clean": "rm -rf dist generated tsconfig.tsbuildinfo",
     "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
@@ -39,5 +39,10 @@
     "@midnight-ntwrk/compact-runtime": "0.16.0",
     "commander": "^14.0.3",
     "zod": "^4.3.6"
+  },
+  "pnpm": {
+    "overrides": {
+      "@midnight-ntwrk/wallet-sdk-address-format": "^3.1.2"
+    }
   }
 }

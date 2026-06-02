@@ -12,6 +12,13 @@
     },
     "start": {
       "dependsOn": ["^build"]
+    },
+    "@e2e/wallet#build": {
+      "outputs": ["dist/**"]
+    },
+    "@e2e/contract#build": {
+      "dependsOn": ["@e2e/wallet#build"],
+      "outputs": ["dist/**"]
     }
   }
 }

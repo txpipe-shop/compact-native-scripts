@@ -1,0 +1,94 @@
+pragma language_version 0.23.0;
+
+import CompactStandardLibrary;
+import "Warden" prefix Warden_;
+
+/// LEDGER ///
+
+/**
+ * @description Maximum token supply — set once in the constructor and never changes.
+ */
+export ledger cap: Uint<64>;
+
+/**
+ * @description Tokens minted so far. Increases on mint, decreases on burn.
+ */
+export ledger currentSupply: Uint<64>;
+
+/**
+ * @description Seed counter used to derive unique nonces for each minted shielded coin.
+ */
+export ledger nonceSeed: Uint<128>;
+
+/**
+ * @description Token domain separator, used to derive the token colour via tokenType().
+ * Sealed — immutable after construction.
+ */
+export sealed ledger tokenDomain: Bytes<32>;
+
+/// CONSTRUCTOR ///
+
+/**
+ * @description Initialises the contract: calls Warden_init() to bootstrap the
+ * access-control commitments, then stores the fixed supply cap and token domain.
+ * @param {Uint<64>} maxSupply - The hard cap on total mintable tokens.
+ * @param {Bytes<32>} domain - Domain separator for this token (e.g. "MyToken").
+ */
+constructor(maxSupply: Uint<64>, domain: Bytes<32>) {
+  Warden_init();
+  cap = disclose(maxSupply);
+  currentSupply = 0;
+  nonceSeed = 0;
+  tokenDomain = disclose(domain);
+}
+
+/// CIRCUITS ///
+
+/**
+ * @description Convenience passthrough to Warden.commit(). Registers the
+ * caller's commitment on-ledger so they satisfy the access-control policy.
+ */
+export circuit commit(): [] {
+  Warden_commit();
+}
+
+/**
+ * @description Mints a new shielded token. Only succeeds if the Warden
+ * access-control policy is satisfied and the cap is not exceeded.
+ *
+ * Evolves the nonce seed to guarantee each minted coin has a unique nonce,
+ * preventing nullifier collisions.
+ *
+ * @param {Uint<64>} amount - Number of tokens to mint.
+ * @param {Either<ZswapCoinPublicKey, ContractAddress>} recipient - Who receives the minted shielded coin.
+ * @return {ShieldedCoinInfo} The newly minted coin's info (needed to prove future spends).
+ */
+export circuit mint(amount: Uint<64>,
+                    recipient: Either<ZswapCoinPublicKey, ContractAddress>
+                    ): ShieldedCoinInfo {
+  Warden_verify();
+  assert((currentSupply + amount) as Uint<64> <= cap,
+         "TokenSupply: exceeds cap");
+  currentSupply = disclose((currentSupply + amount) as Uint<64>);
+  const color = tokenType(tokenDomain, kernel.self());
+  const newNonce = evolveNonce(nonceSeed, pad(32, "TokenSupply:mint"));
+  nonceSeed = disclose((nonceSeed + 1) as Uint<128>);
+  return mintShieldedToken(
+    disclose(color),
+    disclose(amount),
+    disclose(newNonce),
+    disclose(recipient)
+  );
+}
+
+/**
+ * @description Burns a shielded token by receiving it (which consumes the UTXO
+ * at the ledger level), then decreases currentSupply.
+ *
+ * @param {ShieldedCoinInfo} coin - The shielded coin to burn.
+ */
+export circuit burn(coin: ShieldedCoinInfo): [] {
+  Warden_verify();
+  receiveShielded(disclose(coin));
+  currentSupply = disclose((currentSupply - coin.value) as Uint<64>);
+}
