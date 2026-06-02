@@ -8,7 +8,7 @@ import { TokenSupplyContractCircuitKeys, TokenSupplyContractProviders, PrivateSt
 
 const currentDir = path.resolve(new URL(import.meta.url).pathname, '..');
 export const contractConfig = {
-  zkConfigPath: path.resolve(currentDir, 'managed', 'sentinel'),
+  zkConfigPath: path.resolve(currentDir, 'managed', 'tokensupply'),
 };
 
 export const configureProviders = async (

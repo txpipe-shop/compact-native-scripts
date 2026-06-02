@@ -10,7 +10,7 @@ export const CompactCompiledContract = CompiledContract.make<TokenSupplyContract
   CompiledContract.withWitnesses(witnesses),
   CompiledContract.withCompiledFileAssets(
     /* @vite-ignore */
-    new URL('./managed/sentinel', import.meta.url).pathname
+    new URL('./managed/tokensupply', import.meta.url).pathname
   )
 );
 
