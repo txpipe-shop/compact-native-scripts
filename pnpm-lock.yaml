@@ -55,6 +55,34 @@ importers:
         specifier: ^4.1.6
         version: 4.1.6(@types/node@25.6.0)(vite@8.0.12(@types/node@25.6.0)(esbuild@0.27.7)(tsx@4.21.0)(yaml@2.9.0))
 
+  e2e/packages/api:
+    dependencies:
+      '@e2e/contract':
+        specifier: workspace:*
+        version: link:../contract
+      '@e2e/wallet':
+        specifier: workspace:*
+        version: link:../wallet
+      '@midnight-ntwrk/compact-runtime':
+        specifier: 0.16.0
+        version: 0.16.0
+      '@midnight-ntwrk/ledger-v8':
+        specifier: 8.1.0
+        version: 8.1.0
+      '@midnight-ntwrk/midnight-js-contracts':
+        specifier: 4.1.1
+        version: 4.1.1
+      '@midnight-ntwrk/wallet-sdk-address-format':
+        specifier: ^3.1.2
+        version: 3.1.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   e2e/packages/contract:
     dependencies:
       '@e2e/wallet':
