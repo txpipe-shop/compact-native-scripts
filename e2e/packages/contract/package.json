@@ -5,12 +5,16 @@
   "private": true,
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./providers": {
+      "types": "./dist/providers.d.ts",
+      "import": "./dist/providers.js"
     }
   },
   "scripts": {
-    "build": "tsc"
+    "build": "compact compile src/TokenSupply.compact src/managed/tokensupply && mkdir -p dist && cp -Rf ./src/managed ./dist/managed && cp ./src/TokenSupply.compact ./dist"
   },
   "devDependencies": {
     "typescript": "^6.0.3"

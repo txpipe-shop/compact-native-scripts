@@ -37,7 +37,8 @@ ledger mintNonce: Bytes<32>;
  * @description Initialises the contract: calls Warden_init() to bootstrap the
  * access-control commitments, then stores the fixed supply cap and token domain.
  * @param {Uint<64>} maxSupply - The hard cap on total mintable tokens.
- * @param {Bytes<32>} domain - Domain separator for this token (e.g. "MyToken").
+ * @param {Bytes<32>} domain - Domain separator for this token.
+ * @param {Bytes<32>} initNonce - Initial nonce to use for deriving coins.
  */
 constructor(maxSupply: Uint<64>, tokenDomain: Bytes<32>, initNonce: Bytes<32>) {
   Warden_init();
