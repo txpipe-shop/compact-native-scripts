@@ -4,7 +4,11 @@ import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-pri
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
 import { type WalletContext, createWalletAndMidnightProvider } from '@e2e/wallet';
 import path from 'node:path';
-import { TokenSupplyContractCircuitKeys, TokenSupplyContractProviders, PrivateStateId } from './types.js';
+import {
+  TokenSupplyContractCircuitKeys,
+  TokenSupplyContractProviders,
+  PrivateStateId,
+} from './types.js';
 
 const currentDir = path.resolve(new URL(import.meta.url).pathname, '..');
 export const contractConfig = {

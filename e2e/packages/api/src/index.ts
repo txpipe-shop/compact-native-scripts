@@ -1,7 +1,4 @@
-import {
-  deployContract,
-  findDeployedContract,
-} from '@midnight-ntwrk/midnight-js-contracts';
+import { deployContract, findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import {
   CompactCompiledContract,
   createPrivateState,
@@ -35,7 +32,7 @@ export type DeployArguments = {
   maxSupply: bigint;
   tokenDomain: Uint8Array;
   initNonce: Uint8Array;
-}
+};
 
 export type SecretPair = {
   secret: string;
@@ -57,18 +54,17 @@ export class TokenSupplyContract {
     this.state$ = state$;
   }
 
-  // TO-DO: add arguments: secret/randomness to set PrivateState,
-  static async deploy(providers: TokenSupplyContractProviders, args: DeployArguments, psPair: SecretPair): Promise<TokenSupplyContract> {
+  static async deploy(
+    providers: TokenSupplyContractProviders,
+    args: DeployArguments,
+    psPair: SecretPair
+  ): Promise<TokenSupplyContract> {
     console.log('[deploy] Starting contract deployment...');
     const deployedContract = await deployContract<TokenSupplyContractType>(providers, {
       compiledContract: CompactCompiledContract,
       privateStateId: TokenSupplyContractPrivateStateKey,
       initialPrivateState: await this.getPrivateState(psPair, providers, ''),
-      args: [
-        args.maxSupply,
-        args.tokenDomain,
-        args.initNonce
-      ]
+      args: [args.maxSupply, args.tokenDomain, args.initNonce],
     });
 
     const contractAddress = deployedContract.deployTxData.public.contractAddress;
@@ -80,7 +76,7 @@ export class TokenSupplyContract {
           return {
             domain: toHex(ledgerState.domain),
             cap: ledgerState.cap,
-            currentSupply: ledgerState.currentSupply
+            currentSupply: ledgerState.currentSupply,
           };
         })
       );
@@ -110,7 +106,7 @@ export class TokenSupplyContract {
           return {
             domain: toHex(ledgerState.domain),
             cap: ledgerState.cap,
-            currentSupply: ledgerState.currentSupply
+            currentSupply: ledgerState.currentSupply,
           };
         })
       );
@@ -158,6 +154,8 @@ export class TokenSupplyContract {
     const existingPrivateState = await providers.privateStateProvider.get(
       TokenSupplyContractPrivateStateKey
     );
-    return existingPrivateState ?? createPrivateState(fromHex(pair.secret), fromHex(pair.randomness));
+    return (
+      existingPrivateState ?? createPrivateState(fromHex(pair.secret), fromHex(pair.randomness))
+    );
   }
 }
