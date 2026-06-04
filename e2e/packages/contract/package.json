@@ -14,7 +14,8 @@
     }
   },
   "scripts": {
-    "build": "compact compile src/TokenSupply.compact src/managed/tokensupply && mkdir -p dist && cp -Rf ./src/managed ./dist/managed && cp ./src/TokenSupply.compact ./dist"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo src/managed",
+    "build": "compact compile src/TokenSupply.compact src/managed/tokensupply && mkdir -p dist && cp -Rf ./src/managed ./dist/managed && cp ./src/TokenSupply.compact ./dist && tsc"
   },
   "devDependencies": {
     "typescript": "^6.0.3"

@@ -9,7 +9,7 @@
     "make-commitment": "tsx src/cli.ts make-commitment",
     "build": "tsc && turbo run build",
     "compact": "compact compile generated/Warden.compact ./generated/managed/warden",
-    "clean": "rm -rf dist generated tsconfig.tsbuildinfo",
+    "clean": "pnpm --filter @e2e/* run clean && rm -rf dist generated tsconfig.tsbuildinfo .turbo",
     "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",
     "lint": "eslint .",
