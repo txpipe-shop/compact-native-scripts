@@ -62,7 +62,11 @@ docker compose down --volumes
 
 ## Running the example
 
-TO DO
+In the [`e2e/packages/cli`](/e2e/packages/cli/) directory:
+
+```bash
+pnpm tsx src/index.ts
+```
 
 ## References
 
