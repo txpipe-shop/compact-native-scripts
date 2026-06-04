@@ -14,7 +14,7 @@ import { fromHex } from '@midnight-ntwrk/compact-runtime';
 import { map, type Observable } from 'rxjs';
 
 /** Rolling 30-minute TTL for all transactions. */
-const TTL = () => new Date(Date.now() + 30 * 60 * 1_000);
+export const TTL = () => new Date(Date.now() + 30 * 60 * 1_000);
 
 export const toHex = (arr: Uint8Array) =>
   '0x' +
