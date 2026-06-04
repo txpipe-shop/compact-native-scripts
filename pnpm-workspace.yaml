@@ -2,3 +2,4 @@ packages:
   - 'e2e/packages/api'
   - 'e2e/packages/contract'
   - 'e2e/packages/wallet'
+  - 'e2e/packages/cli'

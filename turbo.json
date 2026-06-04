@@ -23,6 +23,10 @@
     "@e2e/api#build": {
       "dependsOn": ["@e2e/contract#build"],
       "outputs": ["dist/**"]
+    },
+    "@e2e/cli#build": {
+      "dependsOn": ["@e2e/api#build"],
+      "outputs": ["dist/**"]
     }
   }
 }

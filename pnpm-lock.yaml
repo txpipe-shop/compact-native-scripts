@@ -83,6 +83,31 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  e2e/packages/cli:
+    dependencies:
+      '@e2e/api':
+        specifier: workspace:*
+        version: link:../api
+      '@e2e/contract':
+        specifier: workspace:*
+        version: link:../contract
+      '@e2e/wallet':
+        specifier: workspace:*
+        version: link:../wallet
+      '@midnight-ntwrk/ledger-v8':
+        specifier: 8.1.0
+        version: 8.1.0
+      '@midnight-ntwrk/midnight-js':
+        specifier: 4.1.1
+        version: 4.1.1
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   e2e/packages/contract:
     dependencies:
       '@e2e/wallet':

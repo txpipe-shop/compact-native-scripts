@@ -1,0 +1,27 @@
+{
+  "name": "@e2e/cli",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "clean": "rm -rf dist tsconfig.tsbuildinfo midnight-level-db",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@e2e/api": "workspace:*",
+    "@e2e/contract": "workspace:*",
+    "@e2e/wallet": "workspace:*",
+    "@midnight-ntwrk/ledger-v8": "8.1.0",
+    "@midnight-ntwrk/midnight-js": "4.1.1",
+    "rxjs": "^7.8.2"
+  }
+}
