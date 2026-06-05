@@ -38,10 +38,10 @@ const main = async () => {
 
   // Initial balances
   console.info('Fetching initial balances...');
-  // await showBalances('Wallet A', ctxA, seeds[0].seed);
-  // await showBalances('Wallet B', ctxB, seeds[1].seed);
-  // await showBalances('Wallet C', ctxC, seeds[2].seed);
-  // await showBalances('Wallet D', ctxD, seeds[3].seed);
+  await showBalances('Wallet A', ctxA, seeds[0].seed);
+  await showBalances('Wallet B', ctxB, seeds[1].seed);
+  await showBalances('Wallet C', ctxC, seeds[2].seed);
+  await showBalances('Wallet D', ctxD, seeds[3].seed);
 
   // Deploy contract
   const providersA = await configureProviders(ctxA, config, 'token-supply-contract-a');

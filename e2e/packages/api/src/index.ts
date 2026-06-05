@@ -11,7 +11,7 @@ import {
   type PrivateState,
 } from '@e2e/contract';
 import { fromHex } from '@midnight-ntwrk/compact-runtime';
-import { map, type Observable } from 'rxjs';
+import { firstValueFrom, map, type Observable } from 'rxjs';
 
 /** Rolling 30-minute TTL for all transactions. */
 export const TTL = () => new Date(Date.now() + 30 * 60 * 1_000);
@@ -134,15 +134,9 @@ export class TokenSupplyContract {
 
   async getCurrentState() {
     console.log('[getCurrentState] Fetching contract state...');
-    let subscription: { unsubscribe: () => void } | null = null;
-
-    subscription = this.state$.subscribe((state) => {
-      // Ensure we only handle the first emission
-      subscription?.unsubscribe();
-
-      console.log('Total supply: ', state.cap);
-      console.log('Current supply: ', state.currentSupply);
-    });
+    const state = await firstValueFrom(this.state$);
+    console.log('Total supply: ', state.cap);
+    console.log('Current supply: ', state.currentSupply);
   }
 
   private static async getPrivateState(
