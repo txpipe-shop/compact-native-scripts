@@ -11,7 +11,8 @@
   },
   "scripts": {
     "clean": "rm -rf dist tsconfig.tsbuildinfo midnight-level-db",
-    "build": "tsc"
+    "build": "tsc",
+    "mint": "tsx src/mint-example.ts"
   },
   "devDependencies": {
     "typescript": "^6.0.3"
