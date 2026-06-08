@@ -12,7 +12,7 @@ export interface Config {
 }
 
 export const currentDir = path.resolve(new URL(import.meta.url).pathname, '..');
-// TODO: fix harcoded values
+
 export class StandaloneConfig implements Config {
   privateStateStoreName = TokenSupplyContractPrivateStateKey;
   logDir = path.resolve(currentDir, '..', 'logs', 'standalone', `${new Date().toISOString()}.log`);

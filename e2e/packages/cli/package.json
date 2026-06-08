@@ -12,6 +12,7 @@
   "scripts": {
     "clean": "rm -rf dist tsconfig.tsbuildinfo midnight-level-db",
     "build": "tsc",
+    "cli": "tsx src/index.ts",
     "mint": "tsx src/mint-example.ts"
   },
   "devDependencies": {
@@ -23,6 +24,7 @@
     "@e2e/wallet": "workspace:*",
     "@midnight-ntwrk/ledger-v8": "8.1.0",
     "@midnight-ntwrk/midnight-js": "4.1.1",
+    "commander": "^14.0.3",
     "rxjs": "^7.8.2"
   }
 }

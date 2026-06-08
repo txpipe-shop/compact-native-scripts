@@ -9,6 +9,24 @@ const GENESIS_MINT_WALLET_SEED_THREE =
 const GENESIS_MINT_WALLET_SEED_FOUR =
   'a51c86de32d0791f7cffc3bdff1abd9bb54987f0ed5effc30c936dddbb9afd9d530c8db445e4f2d3ea42a321b260e022aadf05987c9a67ec7b6b6ca1d0593ec9';
 
+export const MAIN_MENU_PROMPT = `
+  === Main Menu ===
+  1. Deploy contract
+  2. Join existing contract
+  3. Show balances
+  4. Exit
+  Enter choice: `;
+
+export const CONTRACT_MENU_PROMPT = `
+  === Contract Actions ===
+  1. Commit
+  2. Mint
+  3. Burn (Not implemented)
+  4. Get current state
+  5. Show balances
+  6. Return to main menu
+  Enter choice: `;
+
 export type SeedAndSecretPair = {
   seed: string;
   pair: SecretPair;

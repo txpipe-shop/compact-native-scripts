@@ -1,112 +1,39 @@
-import { DeployArguments, TokenSupplyContract } from '@e2e/api';
-import { configureProviders } from '@e2e/contract/providers';
+#!/usr/bin/env node
+import { Command } from 'commander';
+import { stdin as input, stdout as output } from 'node:process';
 import { buildWalletAndWaitForFunds } from '@e2e/wallet';
-
 import { StandaloneConfig } from './config.js';
 import { seeds } from './utils/constants.js';
-import { showBalances, sleep } from './utils/index.js';
+import { runCli } from './cli.js';
+import { createInterface } from 'readline/promises';
 
 const config = new StandaloneConfig();
 
-const SYNC_DELAY_MS = 10_000;
+const program = new Command()
+  .name('compact-e2e')
+  .description('Interactive CLI for token supply contract')
+  .version('0.0.1');
 
-const MAX_SUPPLY = 1_000_000_000_000n;
+program
+  .argument('[id]', 'Wallet ID (1-4)', '1')
+  .option('--max-supply <value>', 'Maximum token supply', '1000000000000')
+  .action(async (id, options) => {
+    const n = Number(id);
+    if (!Number.isInteger(n) || n < 1 || n > 4) {
+      console.error('Error: wallet id must be 1, 2, 3, or 4');
+      process.exit(1);
+    }
+    const maxSupply = BigInt(options.maxSupply);
+    console.info('Building wallet %d...', n);
+    const ctx = await buildWalletAndWaitForFunds(config, seeds[n - 1].seed);
+    const rli = createInterface({ input, output, terminal: true });
+    await runCli(config, ctx, seeds[n - 1], n - 1, maxSupply, rli).finally(
+      ctx.wallet.stop.bind(ctx.wallet)
+    );
+    rli.close();
+  });
 
-const MINT_AMOUNT = 100_000_000n;
-
-/**
- * 1. Initialize wallets
- * . A wallet deploys the contract and commits
- * . The other wallets join and commit
- * . One wallet might attempt to mint before all the commitments are ready
- * . One wallet mints successfully after all commitments are present
- *
- *
- * Maybe do another round to show that any wallet can mint as long as the commits are present?
- * For different kinds of Wardens, maybe show that switching up the Wardens cause the beahviour to change
- * If it's all to any, 4. failed for all and it should succeed for any.
- */
-const main = async () => {
-  // 1. Build four wallets
-  console.log('\n=== Building wallets ===');
-  const [ctxA, ctxB, ctxC, ctxD] = await Promise.all([
-    buildWalletAndWaitForFunds(config, seeds[0].seed),
-    buildWalletAndWaitForFunds(config, seeds[1].seed),
-    buildWalletAndWaitForFunds(config, seeds[2].seed),
-    buildWalletAndWaitForFunds(config, seeds[3].seed),
-  ]);
-
-  // Initial balances
-  console.log('\n=== Initial balances ===');
-  await showBalances('Wallet A', ctxA, seeds[0].seed);
-  await showBalances('Wallet B', ctxB, seeds[1].seed);
-  await showBalances('Wallet C', ctxC, seeds[2].seed);
-  await showBalances('Wallet D', ctxD, seeds[3].seed);
-
-  // Deploy contract
-  const providersA = await configureProviders(ctxA, config, 'token-supply-contract-a');
-
-  console.log('  Deploying token supply contract...');
-  const args: DeployArguments = {
-    maxSupply: MAX_SUPPLY,
-    tokenDomain: Buffer.alloc(32, 'token-supply-contract'),
-    initNonce: crypto.getRandomValues(new Uint8Array(32)),
-  };
-  const contract = await TokenSupplyContract.deploy(providersA, args, seeds[0].pair);
-  await sleep(SYNC_DELAY_MS);
-  const contractAddress = contract.deployedContract?.deployTxData.public.contractAddress;
-  console.log('  ✓ Contract deployed at address: ', contractAddress);
-
-  if (!contractAddress) throw 'Contract address not found after deployment';
-
-  // WalletA commits
-
-  await contract.commit();
-  console.log('  ✓ Wallet A committed');
-  await sleep(SYNC_DELAY_MS);
-
-  // WalletB commits
-  const providersB = await configureProviders(ctxB, config, 'token-supply-contract-b');
-  const contractB = await TokenSupplyContract.join(providersB, contractAddress, seeds[1].pair);
-
-  await contractB.commit();
-  console.log('  ✓ Wallet B committed');
-  await sleep(SYNC_DELAY_MS);
-
-  // WalletC commits
-  const providersC = await configureProviders(ctxC, config, 'token-supply-contract-b');
-  const contractC = await TokenSupplyContract.join(providersC, contractAddress, seeds[2].pair);
-
-  await contractC.commit();
-  console.log('  ✓ Wallet C committed');
-  await sleep(SYNC_DELAY_MS);
-
-  // WalletB tries to commit again
-  try {
-    await contractB.commit();
-  } catch (e) {
-    const error = e as unknown as Error;
-    console.log(error.message);
-  }
-
-  // WalletD commits
-  const providersD = await configureProviders(ctxD, config, 'token-supply-contract-b');
-  const contractD = await TokenSupplyContract.join(providersD, contractAddress, seeds[3].pair);
-
-  await contractD.commit();
-  console.log('  ✓ Wallet D committed');
-  await sleep(SYNC_DELAY_MS);
-
-  // Any wallet can mint after the warden conditions are met
-  await contractB.mint(MINT_AMOUNT, ctxB.shieldedSecretKeys.coinPublicKey);
-  console.log('  ✓ Wallet B minted');
-  await sleep(SYNC_DELAY_MS);
-  await showBalances('Wallet B', ctxB, seeds[1].seed);
-
-  await contractC.getCurrentState();
-};
-
-await main().catch((err) => {
+program.parseAsync().catch((err) => {
   console.error(err);
   process.exit(1);
 });

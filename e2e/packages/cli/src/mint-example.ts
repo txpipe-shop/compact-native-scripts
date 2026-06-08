@@ -15,16 +15,7 @@ const MAX_SUPPLY = 1_000_000_000_000n;
 const MINT_AMOUNT = 100_000_000n;
 
 /**
- * 1. Initialize wallets
- * . A wallet deploys the contract and commits
- * . The other wallets join and commit
- * . One wallet might attempt to mint before all the commitments are ready
- * . One wallet mints successfully after all commitments are present
- *
- *
- * Maybe do another round to show that any wallet can mint as long as the commits are present?
- * For different kinds of Wardens, maybe show that switching up the Wardens cause the beahviour to change
- * If it's all to any, 4. failed for all and it should succeed for any.
+ * TO-DO: add unauthorized wallet trying to commit
  */
 const main = async () => {
   // 1. Build four wallets
@@ -79,15 +70,12 @@ const main = async () => {
   try {
     await contractB.mint(MINT_AMOUNT, ctxB.shieldedSecretKeys.coinPublicKey);
   } catch (e) {
-    console.warn(
-      'Wallet B mint failed (expected): %s',
-      (e as Error).message
-    );
+    console.warn('Wallet B mint failed (expected): %s', (e as Error).message);
   }
   console.info('');
 
   // WalletC commits
-  const providersC = await configureProviders(ctxC, config, 'token-supply-contract-b');
+  const providersC = await configureProviders(ctxC, config, 'token-supply-contract-c');
   const contractC = await TokenSupplyContract.join(providersC, contractAddress, seeds[2].pair);
 
   await contractC.commit();
@@ -104,7 +92,7 @@ const main = async () => {
   console.info('');
 
   // WalletD commits
-  const providersD = await configureProviders(ctxD, config, 'token-supply-contract-b');
+  const providersD = await configureProviders(ctxD, config, 'token-supply-contract-d');
   const contractD = await TokenSupplyContract.join(providersD, contractAddress, seeds[3].pair);
 
   await contractD.commit();
@@ -122,7 +110,9 @@ const main = async () => {
   await contractD.getCurrentState();
 };
 
-await main().catch((err) => {
-  console.error('E2E script failed:', err);
-  process.exit(0);
-}).finally(() => process.exit(0));
+await main()
+  .catch((err) => {
+    console.error('E2E script failed:', err);
+    process.exit(1);
+  })
+  .finally(() => process.exit(0));
