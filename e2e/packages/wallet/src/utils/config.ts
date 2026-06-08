@@ -1,8 +1,7 @@
 import { InMemoryTransactionHistoryStorage } from '@midnight-ntwrk/wallet-sdk-unshielded-wallet';
 import { DefaultConfiguration } from '@midnight-ntwrk/wallet-sdk-facade';
 
-// Single unified configuration for all wallets
-export const configuration: DefaultConfiguration = {
+export const createConfiguration = (): DefaultConfiguration => ({
   networkId: 'undeployed',
   indexerClientConnection: {
     indexerHttpUrl: 'http://localhost:8088/api/v3/graphql',
@@ -15,4 +14,4 @@ export const configuration: DefaultConfiguration = {
     feeBlocksMargin: 5,
   },
   txHistoryStorage: new InMemoryTransactionHistoryStorage(),
-};
+});

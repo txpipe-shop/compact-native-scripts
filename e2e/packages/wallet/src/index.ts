@@ -21,7 +21,7 @@ import {
   withStatus,
 } from './utils/index.js';
 import { Config, WalletContext } from './utils/types.js';
-import { configuration } from './utils/config.js';
+import { createConfiguration } from './utils/config.js';
 
 export const buildWalletAndWaitForFunds = async (
   config: Config,
@@ -39,7 +39,7 @@ export const buildWalletAndWaitForFunds = async (
       const unshieldedKeystore = createKeystore(keys[Roles.NightExternal], getNetworkId());
 
       const wallet = await WalletFacade.init({
-        configuration: configuration,
+        configuration: createConfiguration(),
         shielded: (cfg) => ShieldedWallet(cfg).startWithSecretKeys(shieldedSecretKeys),
         unshielded: (cfg) =>
           UnshieldedWallet(cfg).startWithPublicKey(PublicKey.fromKeyStore(unshieldedKeystore)),
