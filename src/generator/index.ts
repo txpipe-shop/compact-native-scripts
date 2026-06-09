@@ -21,7 +21,8 @@ const MODULE_EXTRA_COMMENTS =
  */
 export function generateCompact(
   script: NativeScriptSchema,
-  languageVersion: string = '0.23.0'
+  languageVersion: string = '0.23.0',
+  testMode: boolean = false
 ): string {
   const cmtLeaves = collectCmtLeaves(script);
   const initBody = initCircuitBody(cmtLeaves);
@@ -32,6 +33,10 @@ export function generateCompact(
     if (!body.trim()) return '\n';
     return '\n    ' + body.trimEnd().split('\n').join('\n    ');
   };
+
+  const testSuffix = testMode
+    ? '\n\nimport Warden;\n\nexport { getCommitment, init, commit, verify, idsToCommitments, commitmentsToIds };\n'
+    : '\n';
 
   return `// Compact Native Script Contract (access/Warden.compact)
 
@@ -106,13 +111,7 @@ module Warden {
    */
   export circuit verify(): [] {${formatCircuit(verifyBody)}
   }
-}
-
-import Warden;
-
-export { getCommitment, init, commit, verify, idsToCommitments, commitmentsToIds };
-
-`;
+}${testSuffix}`;
 }
 
 export { collectCmtLeaves };

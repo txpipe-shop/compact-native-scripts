@@ -28,12 +28,18 @@ pnpm install
 
 ```bash
 pnpm generate-code -i <input-file>
+pnpm generate-code -i <input-file> -o <output-dir>
+pnpm generate-code -i <input-file> -o <output-dir> -t
 ```
 
-Generates a Compact contract module from a JSON input file. The input file defines the script tree (commitment hashes, composite conditions, time locks)
-following the schema documented below.
+Generates a Compact contract module (`Warden.compact`) from a JSON input file.
+The input file defines the script tree (commitment hashes, composite conditions,
+time locks) following the schema documented below.
 
-Output is written to generated/Warden.compact.
+Optional parameters are:
+
+- `-o, --output <path>` Directory to write the generated Compact code (default: `generated/`)
+- `-t, --test` Include import/export boilerplate for unit testing
 
 ### Commitment generator
 

@@ -14,7 +14,7 @@
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "pretest": "tsx src/cli.ts generate-code -i \"${TEST_INPUT:-examples/inputs/all-5.json}\" && pnpm compact",
+    "pretest": "tsx src/cli.ts generate-code -i \"${TEST_INPUT:-examples/inputs/all-5.json}\" -t && pnpm compact",
     "test": "vitest run",
     "test:watch": "vitest"
   },
