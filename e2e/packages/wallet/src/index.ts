@@ -25,7 +25,8 @@ import { createConfiguration } from './utils/config.js';
 
 export const buildWalletAndWaitForFunds = async (
   config: Config,
-  seed: string
+  seed: string,
+  wait: boolean = true,
 ): Promise<WalletContext> => {
   setNetworkId('undeployed');
 
@@ -60,15 +61,16 @@ export const buildWalletAndWaitForFunds = async (
 
   // Check if wallet has funds; if not, wait for incoming tokens
   const balance = syncedState.unshielded.balances[ledger.unshieldedToken().raw] ?? 0n;
-  if (balance === 0n) {
+  if (balance === 0n && wait) {
     const fundedBalance = await withStatus('Waiting for incoming tokens', () =>
       waitForFunds(wallet)
     );
     console.log(`    Balance: ${formatBalance(fundedBalance)} tNight\n`);
   }
-
-  // Register NIGHT UTXOs for dust generation (required for tx fees on Preprod/Standalone)
-  await registerForDustGeneration(wallet, unshieldedKeystore);
+  if (wait) {
+    // Register NIGHT UTXOs for dust generation (required for tx fees on Preprod/Standalone)
+    await registerForDustGeneration(wallet, unshieldedKeystore);
+  }
 
   return { wallet, shieldedSecretKeys, dustSecretKey, unshieldedKeystore };
 };

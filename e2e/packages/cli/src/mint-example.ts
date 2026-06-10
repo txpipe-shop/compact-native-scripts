@@ -8,23 +8,21 @@ import { showBalances, sleep } from './utils/index.js';
 
 const config = new StandaloneConfig();
 
-const SYNC_DELAY_MS = 10_000;
+const SYNC_DELAY_MS = 5_000;
 
 const MAX_SUPPLY = 1_000_000_000_000n;
 
 const MINT_AMOUNT = 100_000_000n;
 
-/**
- * TO-DO: add unauthorized wallet trying to commit
- */
 const main = async () => {
   // 1. Build four wallets
   console.info('Building wallets...');
-  const [ctxA, ctxB, ctxC, ctxD] = await Promise.all([
+  const [ctxA, ctxB, ctxC, ctxD, ctxE] = await Promise.all([
     buildWalletAndWaitForFunds(config, seeds[0].seed),
     buildWalletAndWaitForFunds(config, seeds[1].seed),
     buildWalletAndWaitForFunds(config, seeds[2].seed),
     buildWalletAndWaitForFunds(config, seeds[3].seed),
+    buildWalletAndWaitForFunds(config, seeds[4].seed, false),
   ]);
 
   // Initial balances
@@ -57,6 +55,16 @@ const main = async () => {
   await sleep(SYNC_DELAY_MS);
   console.info('');
 
+  // Unrecognized wallet tries to commit
+  try {
+    const providersE = await configureProviders(ctxE, config, 'token-supply-contract-e');
+    const contractE = await TokenSupplyContract.join(providersE, contractAddress, seeds[4].pair);
+    await contractE.commit();
+  } catch (e) {
+    console.warn('Wallet E commit rejected (expected): %s', (e as Error).message);
+  }
+  console.info('');
+
   // WalletB commits
   const providersB = await configureProviders(ctxB, config, 'token-supply-contract-b');
   const contractB = await TokenSupplyContract.join(providersB, contractAddress, seeds[1].pair);
@@ -64,14 +72,6 @@ const main = async () => {
   await contractB.commit();
   console.info('Wallet B committed');
   await sleep(SYNC_DELAY_MS);
-  console.info('');
-
-  // WalletB tries to mint before all commitments are ready
-  try {
-    await contractB.mint(MINT_AMOUNT, ctxB.shieldedSecretKeys.coinPublicKey);
-  } catch (e) {
-    console.warn('Wallet B mint failed (expected): %s', (e as Error).message);
-  }
   console.info('');
 
   // WalletC commits
@@ -83,11 +83,19 @@ const main = async () => {
   await sleep(SYNC_DELAY_MS);
   console.info('');
 
-  // WalletB tries to commit again
+  // WalletB tries to mint before all commitments are ready
   try {
-    await contractB.commit();
+    await contractB.mint(MINT_AMOUNT, ctxB.shieldedSecretKeys.coinPublicKey);
   } catch (e) {
-    console.warn('Wallet B re-commit rejected (expected): %s', (e as Error).message);
+    console.warn('Wallet B mint failed (expected): %s', (e as Error).message);
+  }
+  console.info('');
+
+  // WalletA tries to commit again
+  try {
+    await contract.commit();
+  } catch (e) {
+    console.warn('Wallet A re-commit rejected (expected): %s', (e as Error).message);
   }
   console.info('');
 
