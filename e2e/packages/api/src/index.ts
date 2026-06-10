@@ -12,6 +12,7 @@ import {
 } from '@e2e/contract';
 import { fromHex } from '@midnight-ntwrk/compact-runtime';
 import { firstValueFrom, map, type Observable } from 'rxjs';
+import { ShieldedCoinInfo } from '@midnight-ntwrk/ledger-v8';
 
 /** Rolling 30-minute TTL for all transactions. */
 export const TTL = () => new Date(Date.now() + 30 * 60 * 1_000);
@@ -43,6 +44,7 @@ export class TokenSupplyContract {
   readonly providers: TokenSupplyContractProviders;
   readonly deployedContract: TokenSupplyContractDeployed | null;
   readonly state$: Observable<TokenSupplyDerivedState>;
+  mintedCoinInfo: ShieldedCoinInfo[];
 
   private constructor(
     providers: TokenSupplyContractProviders,
@@ -52,6 +54,7 @@ export class TokenSupplyContract {
     this.providers = providers;
     this.deployedContract = deployedContract;
     this.state$ = state$;
+    this.mintedCoinInfo = [];
   }
 
   static async deploy(
@@ -59,7 +62,7 @@ export class TokenSupplyContract {
     args: DeployArguments,
     psPair: SecretPair
   ): Promise<TokenSupplyContract> {
-    console.log('[deploy] Starting contract deployment...');
+    console.log('[api] Starting contract deployment...');
     const deployedContract = await deployContract<TokenSupplyContractType>(providers, {
       compiledContract: CompactCompiledContract,
       privateStateId: TokenSupplyContractPrivateStateKey,
@@ -81,7 +84,7 @@ export class TokenSupplyContract {
         })
       );
 
-    console.debug('Deployment fees: ', deployedContract.deployTxData.public.fees);
+    console.debug('[api] Deployment fees: ', deployedContract.deployTxData.public.fees);
     return new TokenSupplyContract(providers, deployedContract, state$);
   }
 
@@ -90,7 +93,7 @@ export class TokenSupplyContract {
     contractAddress: ContractAddress,
     psPair: SecretPair
   ): Promise<TokenSupplyContract> {
-    console.log('[join] Finding existing contract...');
+    console.log('[api] Finding existing contract...');
     const deployedContract = await findDeployedContract<TokenSupplyContractType>(providers, {
       contractAddress,
       compiledContract: CompactCompiledContract,
@@ -111,32 +114,48 @@ export class TokenSupplyContract {
         })
       );
 
-    console.log('[join] Contract joined');
+    console.log('[api] Contract joined');
     return new TokenSupplyContract(providers, deployedContract, state$);
   }
 
   async commit() {
-    console.log('[commit] Building commit transaction...');
+    console.log('[api] Building commit transaction...');
     const tx = await this.deployedContract?.callTx.commit();
-    console.log(`[commit] Committed on tx: ${tx?.public.txHash}`);
+    console.log(`[api] Committed on tx: ${tx?.public.txHash}`);
   }
 
   async mint(amount: bigint, recipient: string) {
-    console.log('[mint] Building mint transaction...');
+    console.log('[api] Building mint transaction...');
     const tx = await this.deployedContract?.callTx.mint(amount, { bytes: fromHex(recipient) });
-
-    console.log(
-      `[mint] Minted ${tx?.private.newCoins[0].value} tokens on tx: ${tx?.public.txHash}`
-    );
+    const minted = tx?.private.newCoins[0];
+    if (minted) {
+      console.log(
+        `[api] Minted ${minted.value} tokens on tx: ${tx?.public.txHash}`
+      );
+      this.mintedCoinInfo.push(minted);
+    }
   }
 
-  // TO-DO: add burn call
+  async burn(type: string, value: bigint) {
+    console.log('[api] Building burn transaction...');
+    const burnCoin = this.mintedCoinInfo.find((coin) => coin.type == type);
+    if (burnCoin) {
+      const tx = await this.deployedContract?.callTx.burn({
+        nonce: fromHex(burnCoin.nonce),
+        color: fromHex(burnCoin.type),
+        value
+      });
+      console.log(`[api] Burned ${value} token on tx: ${tx?.public.txHash}`);
+    } else {
+      console.log(`[api] Failed to find token of type ${type} to burn.`);
+    }
+  }
 
   async getCurrentState() {
-    console.log('[getCurrentState] Fetching contract state...');
+    console.log('[api] Fetching contract state...');
     const state = await firstValueFrom(this.state$);
-    console.log('Total supply: ', state.cap);
-    console.log('Current supply: ', state.currentSupply);
+    console.log('[api] Total supply: ', state.cap);
+    console.log('[api] Current supply: ', state.currentSupply);
   }
 
   private static async getPrivateState(

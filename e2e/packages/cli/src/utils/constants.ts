@@ -1,4 +1,6 @@
 import { SecretPair } from '@e2e/api';
+import { mnemonicToEntropy } from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english.js';
 
 const GENESIS_MINT_WALLET_SEED_ONE =
   '0000000000000000000000000000000000000000000000000000000000000001';
@@ -9,23 +11,11 @@ const GENESIS_MINT_WALLET_SEED_THREE =
 const GENESIS_MINT_WALLET_SEED_FOUR =
   'a51c86de32d0791f7cffc3bdff1abd9bb54987f0ed5effc30c936dddbb9afd9d530c8db445e4f2d3ea42a321b260e022aadf05987c9a67ec7b6b6ca1d0593ec9';
 
-export const MAIN_MENU_PROMPT = `
-  === Main Menu ===
-  1. Deploy contract
-  2. Join existing contract
-  3. Show balances
-  4. Exit
-  Enter choice: `;
-
-export const CONTRACT_MENU_PROMPT = `
-  === Contract Actions ===
-  1. Commit
-  2. Mint
-  3. Burn (Not implemented)
-  4. Get current state
-  5. Show balances
-  6. Return to main menu
-  Enter choice: `;
+const WALLET_FIVE_SEED_PHRASE =
+  'kite cereal sunset anger unlock feed chat knee private note pen cup possible nest dad salad figure father volume fortune scale tell supply cargo';
+export const GENESIS_MINT_WALLET_SEED_FIVE = Buffer.from(
+  mnemonicToEntropy(WALLET_FIVE_SEED_PHRASE, wordlist)
+).toString('hex');
 
 export type SeedAndSecretPair = {
   seed: string;
@@ -61,4 +51,29 @@ export const seeds: SeedAndSecretPair[] = [
       randomness: '4c7238a7da9094db5b82dd15a350da4b07e01fb23fc804458df7c2c720dac81e',
     },
   },
+  {
+    seed: GENESIS_MINT_WALLET_SEED_FIVE,
+    pair: {
+      secret: '06f5ca83643e9acadbeea9ba1f8a8a64d692f248d110d3df345a7e48888b7d93',
+      randomness: '3b1bb2ca83dbfd86b0e183a1c535a8ca850536ce20ee8694b63b78dda2e83a04',
+    },
+  },
 ];
+
+export const MAIN_MENU_PROMPT = `
+  === Main Menu ===
+  1. Deploy contract
+  2. Join existing contract
+  3. Show balances
+  4. Exit
+  Enter choice: `;
+
+export const CONTRACT_MENU_PROMPT = `
+  === Contract Actions ===
+  1. Commit
+  2. Mint
+  3. Burn
+  4. Get current state
+  5. Show balances
+  6. Return to main menu
+  Enter choice: `;

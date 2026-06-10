@@ -32,7 +32,7 @@ export async function runCli(
         );
         break;
       }
-      case '2': // TO-DO: failed join should stay in this loop, not pass into circuit handler
+      case '2':
         try {
           const contractAddress = await rli.question('Enter the contract address: ');
           contract = await TokenSupplyContract.join(providers, contractAddress, details.pair);
@@ -86,9 +86,15 @@ async function handleCircuits(
         } catch (e) {
           console.log('Error minting: ', (e as Error).message);
         }
-        return;
+        break;
       case '3':
-        console.log('Not implemented yet.');
+        try {
+          const type = await rli.question('Enter the type of token to burn: ');
+          const amount = await rli.question('Enter the amount to mint: ');
+          await contract.burn(type, BigInt(amount));
+        } catch (e) {
+          console.log('Error burning: ', (e as Error).message);
+        }
         break;
       case '4':
         await contract.getCurrentState();

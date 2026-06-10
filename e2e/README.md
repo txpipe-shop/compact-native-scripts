@@ -41,7 +41,7 @@ The example consists of the following packages:
 
 ## Set up
 
-In the `e2e` directory, build the packages:
+In the `e2e` directory, the following command compiles the contract and builds the packages:
 
 ```bash
 pnpm build
