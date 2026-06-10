@@ -24,6 +24,8 @@
     "@e2e/wallet": "workspace:*",
     "@midnight-ntwrk/ledger-v8": "8.1.0",
     "@midnight-ntwrk/midnight-js": "4.1.1",
+    "@midnight-ntwrk/wallet-sdk-indexer-client": "1.2.2",
+    "@scure/bip39": "^2.2.0",
     "commander": "^14.0.3",
     "rxjs": "^7.8.2"
   }

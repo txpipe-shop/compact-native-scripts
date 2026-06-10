@@ -100,6 +100,12 @@ importers:
       '@midnight-ntwrk/midnight-js':
         specifier: 4.1.1
         version: 4.1.1
+      '@midnight-ntwrk/wallet-sdk-indexer-client':
+        specifier: 1.2.2
+        version: 1.2.2(ws@8.21.0)
+      '@scure/bip39':
+        specifier: ^2.2.0
+        version: 2.2.0
       commander:
         specifier: ^14.0.3
         version: 14.0.3
