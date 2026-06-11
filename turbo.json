@@ -12,6 +12,21 @@
     },
     "start": {
       "dependsOn": ["^build"]
+    },
+    "@e2e/wallet#build": {
+      "outputs": ["dist/**"]
+    },
+    "@e2e/contract#build": {
+      "dependsOn": ["@e2e/wallet#build"],
+      "outputs": ["dist/**"]
+    },
+    "@e2e/api#build": {
+      "dependsOn": ["@e2e/contract#build"],
+      "outputs": ["dist/**"]
+    },
+    "@e2e/cli#build": {
+      "dependsOn": ["@e2e/api#build"],
+      "outputs": ["dist/**"]
     }
   }
 }

@@ -9,3 +9,5 @@ managed/
 .turbo/
 
 tsconfig.tsbuildinfo
+
+e2e/packages/cli/midnight-level-db

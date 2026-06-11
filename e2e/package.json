@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "pnpm -w exec turbo run build",
+    "clean": "pnpm --filter @e2e/* run clean"
+  }
+}

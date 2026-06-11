@@ -14,6 +14,11 @@ program
   .command('generate-code')
   .description('Generate Compact code from a JSON schema')
   .requiredOption('-i, --input <path>', 'Path to input JSON file')
+  .option(
+    '-o, --output <path>',
+    'Directory to write the generated Compact code (default: <project>/generated)'
+  )
+  .option('-t, --test', 'Include exports for unit testing')
   .action((options) => {
     let raw: unknown;
     try {
@@ -29,8 +34,8 @@ program
       process.exit(1);
     }
 
-    const compactCode = generateCompact(result.data);
-    const outputDir = path.resolve(__dirname, '../generated');
+    const compactCode = generateCompact(result.data, undefined, options.test);
+    const outputDir = options.output || path.resolve(__dirname, '../generated');
     mkdirSync(outputDir, { recursive: true });
     const outputPath = path.join(outputDir, 'Warden.compact');
     writeFileSync(outputPath, compactCode, 'utf-8');
