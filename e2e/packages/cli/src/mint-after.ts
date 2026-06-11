@@ -104,15 +104,6 @@ const main = async () => {
   }
 };
 
-async function testMain() {
-  const result = await QueryRunner.runPromise(
-    BlockHash,
-    { offset: null }, // null = latest block
-    { url: config.indexer }
-  );
-  console.log(result);
-}
-
 await main()
   .catch((err) => {
     console.error('E2E script failed:', err);

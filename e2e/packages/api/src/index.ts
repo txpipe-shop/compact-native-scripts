@@ -129,9 +129,7 @@ export class TokenSupplyContract {
     const tx = await this.deployedContract?.callTx.mint(amount, { bytes: fromHex(recipient) });
     const minted = tx?.private.newCoins[0];
     if (minted) {
-      console.log(
-        `[api] Minted ${minted.value} tokens on tx: ${tx?.public.txHash}`
-      );
+      console.log(`[api] Minted ${minted.value} tokens on tx: ${tx?.public.txHash}`);
       this.mintedCoinInfo.push(minted);
     }
   }
@@ -143,7 +141,7 @@ export class TokenSupplyContract {
       const tx = await this.deployedContract?.callTx.burn({
         nonce: fromHex(burnCoin.nonce),
         color: fromHex(burnCoin.type),
-        value
+        value,
       });
       console.log(`[api] Burned ${value} token on tx: ${tx?.public.txHash}`);
     } else {

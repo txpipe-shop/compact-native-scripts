@@ -108,7 +108,14 @@ const main = async () => {
   await sleep(SYNC_DELAY_MS);
 
   // Filter known coins to find the one that was freshly minted
-  const burnCoin = (await firstValueFrom(ctxD.wallet.shielded.state)).availableCoins.find((coin) => !['0000000000000000000000000000000000000000000000000000000000000000', '0000000000000000000000000000000000000000000000000000000000000001', '0000000000000000000000000000000000000000000000000000000000000002'].find((v) => coin.coin.type == v));
+  const burnCoin = (await firstValueFrom(ctxD.wallet.shielded.state)).availableCoins.find(
+    (coin) =>
+      ![
+        '0000000000000000000000000000000000000000000000000000000000000000',
+        '0000000000000000000000000000000000000000000000000000000000000001',
+        '0000000000000000000000000000000000000000000000000000000000000002',
+      ].find((v) => coin.coin.type == v)
+  );
   if (!burnCoin) return;
   console.info('Burning...');
   await contractD.burn(burnCoin?.coin.type, BURN_AMOUNT);

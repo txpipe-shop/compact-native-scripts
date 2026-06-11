@@ -26,7 +26,7 @@ import { createConfiguration } from './utils/config.js';
 export const buildWalletAndWaitForFunds = async (
   config: Config,
   seed: string,
-  wait: boolean = true,
+  wait: boolean = true
 ): Promise<WalletContext> => {
   setNetworkId('undeployed');
 
