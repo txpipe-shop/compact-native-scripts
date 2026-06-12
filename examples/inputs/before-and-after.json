@@ -1,0 +1,13 @@
+{
+  "type": "all",
+  "scripts": [
+    {
+      "type": "after",
+      "block": 100
+    },
+    {
+      "type": "before",
+      "block": 500
+    }
+  ]
+}

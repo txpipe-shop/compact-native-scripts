@@ -6,6 +6,7 @@ import { WardenSimulator } from './warden-simulator.js';
 
 const input = NativeScriptSchema.parse(JSON.parse(readFileSync(process.env.TEST_INPUT!, 'utf-8')));
 const cmtLeaves = collectCmtLeaves(input);
+const hasCmt = cmtLeaves.length > 0;
 const secretPairs = JSON.parse(readFileSync('examples/example-pairs.json', 'utf-8'));
 const cmtHexSet = new Set(
   cmtLeaves.flatMap((l) => l.hashes).map((h) => Buffer.from(h).toString('hex'))
@@ -18,14 +19,8 @@ function hasTimeLocks(script: NativeScriptSchema): boolean {
   return false;
 }
 
-function hasCmtLeaves(script: NativeScriptSchema): boolean {
-  if (script.type === 'cmt') return true;
-  if ('scripts' in script) return script.scripts.some(hasCmtLeaves);
-  return false;
-}
-
 describe('Verify circuit', () => {
-  it.runIf(hasCmtLeaves(input) && !hasTimeLocks(input))(
+  it.runIf(hasCmt && !hasTimeLocks(input))(
     'passes when all matching commitments are committed',
     () => {
       const sim = new WardenSimulator();
@@ -45,7 +40,7 @@ describe('Verify circuit', () => {
     expect(() => sim.verify()).toThrow();
   });
 
-  it.runIf(!hasTimeLocks(input))('fails when no commitments are committed', () => {
+  it.runIf(hasCmt && !hasTimeLocks(input))('fails when no commitments are committed', () => {
     const sim = new WardenSimulator();
     sim.init();
     expect(() => sim.verify()).toThrow('Commitments or time-lock conditions not satisfied');
@@ -53,32 +48,35 @@ describe('Verify circuit', () => {
 
   it.runIf(hasTimeLocks(input))('passes when current block meets time-lock conditions', () => {
     const sim = new WardenSimulator();
-    sim.init();
-    for (const { secret, randomness } of matchingPairs) {
-      sim.commitWith(
-        new Uint8Array(Buffer.from(secret, 'hex')),
-        new Uint8Array(Buffer.from(randomness, 'hex'))
-      );
+    if (hasCmt) {
+      sim.init();
+      for (const { secret, randomness } of matchingPairs) {
+        sim.commitWith(
+          new Uint8Array(Buffer.from(secret, 'hex')),
+          new Uint8Array(Buffer.from(randomness, 'hex'))
+        );
+      }
     }
-    sim.setBlockTime(1_000_000_000);
+    sim.setBlockTime(400);
     expect(() => sim.verify()).not.toThrow();
   });
 
   it.runIf(hasTimeLocks(input))('fails when current block is before after threshold', () => {
     const sim = new WardenSimulator();
-    sim.init();
-    for (const { secret, randomness } of matchingPairs) {
-      sim.commitWith(
-        new Uint8Array(Buffer.from(secret, 'hex')),
-        new Uint8Array(Buffer.from(randomness, 'hex'))
-      );
+    if (hasCmt) {
+      sim.init();
+      for (const { secret, randomness } of matchingPairs) {
+        sim.commitWith(
+          new Uint8Array(Buffer.from(secret, 'hex')),
+          new Uint8Array(Buffer.from(randomness, 'hex'))
+        );
+      }
     }
     sim.setBlockTime(0);
     expect(() => sim.verify()).toThrow();
   });
 
-  it('cleans up idsToCommitments after successful verify', () => {
-    if (!hasCmtLeaves(input)) return;
+  it.runIf(hasCmt)('cleans up idsToCommitments after successful verify', () => {
     const sim = new WardenSimulator();
     sim.init();
     for (const { secret, randomness } of matchingPairs) {
@@ -87,15 +85,12 @@ describe('Verify circuit', () => {
         new Uint8Array(Buffer.from(randomness, 'hex'))
       );
     }
-    if (hasTimeLocks(input)) sim.setBlockTime(1_000_000_000);
+    if (hasTimeLocks(input)) sim.setBlockTime(400);
 
     const paths = [...new Set(cmtLeaves.map((l) => l.path))];
     for (const p of paths) {
       expect(
-        sim
-          .getLedger()
-          .idsToCommitments.lookup(Buffer.from(p.padEnd(8)))
-          .isEmpty()
+        (sim.getLedger() as any).idsToCommitments.lookup(Buffer.from(p.padEnd(8))).isEmpty()
       ).toBe(false);
     }
 
@@ -103,43 +98,42 @@ describe('Verify circuit', () => {
 
     for (const p of paths) {
       expect(
-        sim
-          .getLedger()
-          .idsToCommitments.lookup(Buffer.from(p.padEnd(8)))
-          .isEmpty()
+        (sim.getLedger() as any).idsToCommitments.lookup(Buffer.from(p.padEnd(8))).isEmpty()
       ).toBe(true);
     }
   });
 
-  it('leaves idsToCommitments unchanged when verify fails', () => {
-    if (!hasCmtLeaves(input) || !hasTimeLocks(input)) return;
-    const sim = new WardenSimulator();
-    sim.init();
-    for (const { secret, randomness } of matchingPairs) {
-      sim.commitWith(
-        new Uint8Array(Buffer.from(secret, 'hex')),
-        new Uint8Array(Buffer.from(randomness, 'hex'))
-      );
-    }
+  it.runIf(hasCmt && hasTimeLocks(input))(
+    'leaves idsToCommitments unchanged when verify fails',
+    () => {
+      const sim = new WardenSimulator();
+      sim.init();
+      for (const { secret, randomness } of matchingPairs) {
+        sim.commitWith(
+          new Uint8Array(Buffer.from(secret, 'hex')),
+          new Uint8Array(Buffer.from(randomness, 'hex'))
+        );
+      }
 
-    const paths = [...new Set(cmtLeaves.map((l) => l.path))];
-    const before: Record<string, string[]> = {};
-    for (const p of paths) {
-      const key = Buffer.from(p.padEnd(8));
-      before[p] = [...sim.getLedger().idsToCommitments.lookup(key)]
-        .map((b: Uint8Array) => Buffer.from(b).toString('hex'))
-        .sort();
-    }
+      const paths = [...new Set(cmtLeaves.map((l) => l.path))];
+      const before: Record<string, string[]> = {};
+      for (const p of paths) {
+        const key = Buffer.from(p.padEnd(8));
+        before[p] = [...(sim.getLedger() as any).idsToCommitments.lookup(key)]
+          .map((b: Uint8Array) => Buffer.from(b).toString('hex'))
+          .sort();
+      }
 
-    sim.setBlockTime(0);
-    expect(() => sim.verify()).toThrow();
+      sim.setBlockTime(0);
+      expect(() => sim.verify()).toThrow();
 
-    for (const p of paths) {
-      const key = Buffer.from(p.padEnd(8));
-      const after = [...sim.getLedger().idsToCommitments.lookup(key)]
-        .map((b: Uint8Array) => Buffer.from(b).toString('hex'))
-        .sort();
-      expect(after).toEqual(before[p]);
+      for (const p of paths) {
+        const key = Buffer.from(p.padEnd(8));
+        const after = [...(sim.getLedger() as any).idsToCommitments.lookup(key)]
+          .map((b: Uint8Array) => Buffer.from(b).toString('hex'))
+          .sort();
+        expect(after).toEqual(before[p]);
+      }
     }
-  });
+  );
 });
