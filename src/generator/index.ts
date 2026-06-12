@@ -5,7 +5,7 @@ import { collectCmtLeaves } from './utils.js';
 import { verifyCircuitBody } from './verify.js';
 
 const MODULE_DESCRIPTION = 'A contract library.';
-const MODULE_EXTRA_COMMENTS =
+const MODULE_WITH_CMTS_COMMENTS =
   ' * Provides a mechanism to grant access to a circuit based on a set of commitments.';
 
 /**
@@ -25,8 +25,10 @@ export function generateCompact(
   testMode: boolean = false
 ): string {
   const cmtLeaves = collectCmtLeaves(script);
-  const initBody = initCircuitBody(cmtLeaves);
-  const commitBody = commitCircuitBody(cmtLeaves);
+  const hasCmtLeaves = cmtLeaves.length > 0;
+
+  const initBody = hasCmtLeaves ? initCircuitBody(cmtLeaves) : '';
+  const commitBody = hasCmtLeaves ? commitCircuitBody(cmtLeaves) : '';
   const verifyBody = verifyCircuitBody(script, cmtLeaves);
 
   const formatCircuit = (body: string) => {
@@ -35,21 +37,17 @@ export function generateCompact(
   };
 
   const testSuffix = testMode
-    ? '\n\nimport Warden;\n\nexport { getCommitment, init, commit, verify, idsToCommitments, commitmentsToIds };\n'
+    ? hasCmtLeaves
+      ? '\n\nimport Warden;\n\nexport { getCommitment, init, commit, verify, idsToCommitments, commitmentsToIds };\n'
+      : '\n\nimport Warden;\n\nexport { getCommitment, verify };\n'
     : '\n';
 
-  return `// Compact Native Script Contract (access/Warden.compact)
+  const moduleExtraComments = hasCmtLeaves
+    ? MODULE_WITH_CMTS_COMMENTS
+    : ' * Provides a mechanism to grant access to a circuit based on time lock conditions.';
 
-pragma language_version ${languageVersion};
-
-/**
- * @module Warden
- * @description ${MODULE_DESCRIPTION}
-${MODULE_EXTRA_COMMENTS}
- */
-module Warden {
-  import CompactStandardLibrary;
-
+  const ledgerSection = hasCmtLeaves
+    ? `
   /**
    * @description Store the IDs to which each committment has to be added.
    * @key commitment hash
@@ -63,7 +61,11 @@ module Warden {
    * @value set of commitments
    */
   export ledger idsToCommitments: Map<Bytes<8>, Set<Bytes<32>>>;
+`
+    : '';
 
+  const witnessesSection = hasCmtLeaves
+    ? `
   /**
    * @description Witness function to fetch a secret from the wallet.
    * This secret will be used to obtain the commitment.
@@ -75,14 +77,22 @@ module Warden {
    * generates a specific commitment.
    */
   witness randomness(): Bytes<32>;
+`
+    : '';
 
+  const getCommitmentCircuit = testMode
+    ? `
   /**
    * @description Generates the commitment that will be added into the idsToCommitments ledger.
    */
   export pure circuit getCommitment(secret: Bytes<32>, randomness: Bytes<32>): Bytes<32> {
     return persistentCommit<Bytes<32>>(secret, randomness);
   }
+`
+    : '';
 
+  const initCircuit = hasCmtLeaves
+    ? `
   /**
    * @description Initialize state. Constructors are not available within
    * modules, so this circuit has to be called from the overall program's
@@ -90,7 +100,11 @@ module Warden {
    */
   export circuit init(): [] {${formatCircuit(initBody)}
   }
+`
+    : '';
 
+  const commitCircuit = hasCmtLeaves
+    ? `
   /**
    * @description Add a commitment if it is authorized (member of
    * commitmentsToIds).
@@ -101,7 +115,21 @@ module Warden {
     assert(commitmentsToIds.member(commitment), "This key is not authorized to commit in this contract");
     assert(!commitmentsToIds.lookup(commitment).isEmpty(), "Commitment ID set is empty");${formatCircuit(commitBody)}
   }
+`
+    : '';
 
+  return `// Compact Native Script Contract (access/Warden.compact)
+
+pragma language_version ${languageVersion};
+
+/**
+ * @module Warden
+ * @description ${MODULE_DESCRIPTION}
+${moduleExtraComments}
+ */
+module Warden {
+  import CompactStandardLibrary;
+${ledgerSection}${witnessesSection}${getCommitmentCircuit}${initCircuit}${commitCircuit}
   /**
    * @description Checks that the commitments currently present satisfy the
    * predefined conditions.
