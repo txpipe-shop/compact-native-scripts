@@ -13,6 +13,10 @@ The generated Compact utilizes the `language_version` constraint and the version
 
 Modules allow namespace management. The `module` keyword creates a named collection of program elements such as ledger and circuit declarations. We define the contract as a module to have a library sort of access to it.
 
+## Commitment-based contract
+
+When the input script contains at least one `cmt` script, the contract manages a set of commitments on-chain. This section describes the ledger state, witness functions, and circuits that make up this configuration.
+
 ### Ledger
 
 A field declared with `ledger` signifies that it is a part of the contract's public state.
@@ -53,6 +57,18 @@ This circuit verifies that all of the expected conditions are met. These conditi
 - the commitments present in the ledger satisfy the predetermined clauses,
 - and the block corresponds with the desired height, if any.
 
+## Timelock-only contract
+
+When the input script contains only time-lock clauses (`after` / `before`) with no `cmt` scripts, the contract is **stateless**: no ledger fields or witness functions are required, and only the `verify` circuit is generated.
+
+### Circuits
+
+`init` and `commit` circuits are not generated — there is no state to initialize or update.
+
+#### `verify` circuit
+
+This circuit checks only the time-lock conditions of the input script. It evaluates the clauses for the desired block height. On success, the circuit does not need to reset any state.
+
 ## Usage
 
 To use the generated code in your own project, you need to add the `Warden.compact` file with your source code, and import it wherever you need it using:
@@ -61,4 +77,4 @@ To use the generated code in your own project, you need to add the `Warden.compa
 import "<path_to_file>/Warden";
 ```
 
-You can use the `prefix` keyword to have the circuits accessible as <prefix><circuit*name>, e.g. `import "<path_to_file>/Warden" prefix Warden*;` means "Warden_init", "Warden_commit" and "Warden_verify" are in scope.
+You can use the `prefix` keyword to have the circuits accessible as <prefix><circuit\*name>, e.g. `import "<path_to_file>/Warden" prefix Warden_;` means "Warden_init", "Warden_commit" and "Warden_verify" are in scope.
