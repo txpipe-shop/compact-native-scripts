@@ -1,4 +1,4 @@
-import { select, input, number, confirm } from '@inquirer/prompts';
+import { select, input, number } from '@inquirer/prompts';
 import { writeFileSync } from 'fs';
 
 type ScriptNode = Record<string, unknown>;
@@ -34,15 +34,22 @@ const SCRIPT_TYPES = [
     value: 'atLeast',
     description: 'At least N of the sub-scripts must be satisfied',
   },
+  {
+    name: 'done',
+    value: 'done',
+    description: 'Finish building the script',
+  },
 ] as const;
 
-async function promptForScript(): Promise<ScriptNode> {
-  const type = await select<'cmt' | 'after' | 'before' | 'any' | 'all' | 'atLeast'>({
+async function promptForScript(): Promise<ScriptNode | null> {
+  const type = await select<'cmt' | 'after' | 'before' | 'any' | 'all' | 'atLeast' | 'done'>({
     message: 'Select script type:',
     choices: SCRIPT_TYPES,
   });
 
   switch (type) {
+    case 'done':
+      return null;
     case 'cmt': {
       const hash = await input({
         message: 'Enter commitment hash (64 hex characters):',
@@ -83,22 +90,20 @@ async function promptForScript(): Promise<ScriptNode> {
 
 async function collectScripts(): Promise<ScriptNode[]> {
   const scripts: ScriptNode[] = [];
-  let addMore = true;
-  while (addMore) {
-    scripts.push(await promptForScript());
-    if (scripts.length >= 1) {
-      addMore = await confirm({ message: 'Add another sub-script?', default: true });
-    }
+  while (true) {
+    const node = await promptForScript();
+    if (node === null) break;
+    scripts.push(node);
   }
   return scripts;
 }
 
 export async function scriptWizard(): Promise<void> {
   console.log(
-    'This wizard helps you build a native script schema JSON file. Native scripts define spending conditions for UTXOs using commitment verification, time locks, and composite (any/all/atLeast) clauses.\n'
+    'This wizard helps you interactively build a script JSON file. The output can be used as input to `pnpm generate-code -i <file>` to generate a Compact contract that checks commitments and/or time-lock conditions to authorize an operation.\n'
   );
   const schema = await promptForScript();
-  const outputPath = await input({ message: 'Output file path:', required: true });
+  const outputPath = await input({ message: 'Output file path:', default: 'script.json' });
   writeFileSync(outputPath, JSON.stringify(schema, null, 2) + '\n', 'utf-8');
   console.log(`Written to: ${outputPath}`);
 }

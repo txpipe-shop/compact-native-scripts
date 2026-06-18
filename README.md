@@ -24,6 +24,31 @@ pnpm install
 
 ## Usage
 
+### Commitment generator
+
+```bash
+pnpm make-commitment -s <seed_hex> -o <output-file>
+```
+
+Generates a SecretPair comprised of a `secret` and a `randomness`, and the corresponding `commitment` product of these two.
+Optional parameters are:
+
+- -s, --seed <hex> 64-character hex seed for the secret
+- -o, --output <path> Path to write the result as JSON
+
+### Script wizard
+
+```bash
+pnpm script-wizard
+```
+
+Launches an interactive wizard that builds a native script schema JSON file
+that can be used as input to the `generate-code` command.
+Walks through script node types — commitment (`cmt`), time locks (`after`/`before`),
+and composites (`any`/`all`/`atLeast`) — and writes the result to a JSON file
+(defaults to `script.json`).
+Ensure all commitments required have been gathered prior to running this command.
+
 ### Compact code generator
 
 ```bash
@@ -40,18 +65,6 @@ Optional parameters are:
 
 - `-o, --output <path>` Directory to write the generated Compact code (default: `generated/`)
 - `-t, --test` Include import/export boilerplate for unit testing
-
-### Commitment generator
-
-```bash
-pnpm make-commitment -s <seed_hex> -o <output-file>
-```
-
-Generates a SecretPair comprised of a `secret` and a `randomness`, and the corresponding `commitment` product of these two.
-Optional parameters are:
-
-- -s, --seed <hex> 64-character hex seed for the secret
-- -o, --output <path> Path to write the result as JSON
 
 ### Compile
 
