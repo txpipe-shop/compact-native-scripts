@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { NativeScriptSchema } from './schema.js';
 import { generateCompact } from './generator/index.js';
 import { generateSecretPair, generateCommitment } from './pair.js';
+import { scriptWizard } from './script-wizard.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -78,6 +79,13 @@ program
       console.log(`Randomness (hex):  ${randomnessHex}`);
       console.log(`Commitment (hex):  ${commitmentHex}`);
     }
+  });
+
+program
+  .command('script-wizard')
+  .description('Interactively build a native script schema JSON file')
+  .action(async () => {
+    await scriptWizard();
   });
 
 program.parse();
