@@ -53,8 +53,7 @@ async function promptForScript(): Promise<ScriptNode | null> {
     case 'cmt': {
       const hash = await input({
         message: 'Enter commitment hash (64 hex characters):',
-        validate: (v: string) =>
-          /^[0-9a-f]{64}$/i.test(v) || 'Must be 64 hex characters',
+        validate: (v: string) => /^[0-9a-f]{64}$/i.test(v) || 'Must be 64 hex characters',
       });
       return { type: 'cmt', hash: hash.toLowerCase() };
     }
@@ -102,8 +101,14 @@ export async function scriptWizard(): Promise<void> {
   console.log(
     'This wizard helps you interactively build a script JSON file. The output can be used as input to `pnpm generate-code -i <file>` to generate a Compact contract that checks commitments and/or time-lock conditions to authorize an operation.\n'
   );
+  console.log(
+    'Before running this command, ensure each participant has generated their commitment via `pnpm make-commitment` and shared the commitment hex with you.\n'
+  );
   const schema = await promptForScript();
   const outputPath = await input({ message: 'Output file path:', default: 'script.json' });
   writeFileSync(outputPath, JSON.stringify(schema, null, 2) + '\n', 'utf-8');
-  console.log(`Written to: ${outputPath}`);
+  console.log(`✅ Script written to: ${outputPath}`);
+  console.log(
+    `You can now run pnpm generate-code -i ${outputPath} to generate the Compact contract.`
+  );
 }
