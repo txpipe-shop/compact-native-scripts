@@ -11,17 +11,23 @@ The idea is that the CLI generates a Compact contract module that can be used to
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Setup](#setup)
-- [Documentation](#documentation)
-- [Authorization workflow](#authorization-workflow)
-- [Commands](#commands)
-  - [Commitment generator](#commitment-generator)
-  - [Script wizard](#script-wizard)
-  - [Compact code generator](#compact-code-generator)
-  - [Compile](#compile)
-  - [Test](#test)
-- [E2E example](#e2e-example)
+- [Compact native scripts](#compact-native-scripts)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+    - [Install CLI globally](#install-cli-globally)
+  - [Documentation](#documentation)
+  - [Authorization workflow](#authorization-workflow)
+    - [Participant](#participant)
+    - [Script author](#script-author)
+  - [Commands](#commands)
+    - [Commitment generator](#commitment-generator)
+    - [Script wizard](#script-wizard)
+  - [Usage](#usage)
+    - [Compact code generator](#compact-code-generator)
+    - [Compile](#compile)
+    - [Test](#test)
+  - [E2E example](#e2e-example)
 
 ## Prerequisites
 
@@ -36,6 +42,25 @@ Install dependencies
 ```bash
 pnpm install
 ```
+
+### Install CLI globally
+
+Build the project, then register the `warden-tool` binary on your PATH:
+
+```bash
+pnpm build
+pnpm link --global
+```
+
+Now `warden-tool` is available as a system-wide command:
+
+```bash
+warden-tool --help
+warden-tool generate-code -i <input-file>
+warden-tool make-commitment -s <seed>
+```
+
+> **Note:** `pnpm link --global` creates a symlink to your local build. After pulling changes or rebuilding, the command reflects updates automatically.
 
 ## Documentation
 
@@ -155,6 +180,8 @@ Walks through script node types — commitment (`cmt`), time locks (`after`/`bef
 and composites (`any`/`all`/`atLeast`) — and writes the result to a JSON file
 (defaults to `script.json`).
 Ensure all commitments required have been gathered prior to running this command.
+
+## Usage
 
 ### Compact code generator
 
