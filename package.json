@@ -7,6 +7,7 @@
   "scripts": {
     "generate-code": "tsx src/cli.ts generate-code",
     "make-commitment": "tsx src/cli.ts make-commitment",
+    "script-wizard": "tsx src/cli.ts script-wizard",
     "build": "tsc && turbo run build",
     "compact": "compact compile generated/Warden.compact ./generated/managed/warden",
     "clean": "pnpm --filter @e2e/* run clean && rm -rf dist generated tsconfig.tsbuildinfo .turbo",
@@ -36,6 +37,7 @@
     "vitest": "^4.1.6"
   },
   "dependencies": {
+    "@inquirer/prompts": "^8.5.2",
     "@midnight-ntwrk/compact-runtime": "0.16.0",
     "commander": "^14.0.3",
     "zod": "^4.3.6"
