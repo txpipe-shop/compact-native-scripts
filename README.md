@@ -1,4 +1,4 @@
-# Compact native scripts
+# Warden tool
 
 CLI-based application to generate compact code that checks commitments and time-lock conditions based on multisignature scripts. Accepts JSON inputs structured around Cardano native script patterns, supporting nested conditions (`any`, `all`, `atLeast`).
 
@@ -11,7 +11,7 @@ The idea is that the CLI generates a Compact contract module that can be used to
 
 ## Table of Contents
 
-- [Compact native scripts](#compact-native-scripts)
+- [Warden tool](#warden-tool)
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
   - [Setup](#setup)
