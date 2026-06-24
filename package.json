@@ -1,9 +1,12 @@
 {
-  "name": "compact-native-scripts",
+  "name": "warden-tool",
   "version": "1.0.0",
   "type": "module",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "warden-tool": "./dist/cli.js"
+  },
   "scripts": {
     "generate-code": "tsx src/cli.ts generate-code",
     "make-commitment": "tsx src/cli.ts make-commitment",
