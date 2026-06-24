@@ -80,7 +80,7 @@ export function generateCompact(
 `
     : '';
 
-  const getCommitmentCircuit = testMode
+  const getCommitmentCircuit = hasCmtLeaves
     ? `
   /**
    * @description Generates the commitment that will be added into the idsToCommitments ledger.
