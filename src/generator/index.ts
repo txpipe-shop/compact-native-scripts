@@ -53,14 +53,14 @@ export function generateCompact(
    * @key commitment hash
    * @value set of IDs
    */
-  export ledger commitmentsToIds: Map<Bytes<32>, Set<Bytes<8>>>;
+  ${testMode ? 'export ' : ''}ledger commitmentsToIds: Map<Bytes<32>, Set<Bytes<8>>>;
 
   /**
    * @description Store commitments.
    * @key hash id of the set
    * @value set of commitments
    */
-  export ledger idsToCommitments: Map<Bytes<8>, Set<Bytes<32>>>;
+  ${testMode ? 'export ' : ''}ledger idsToCommitments: Map<Bytes<8>, Set<Bytes<32>>>;
 `
     : '';
 

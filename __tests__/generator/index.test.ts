@@ -30,12 +30,12 @@ describe('generateCompact', () => {
 
   it('declares the commitmentsToIds ledger', () => {
     const result = generateCompact(minimalScript);
-    expect(result).toContain('export ledger commitmentsToIds');
+    expect(result).toContain('ledger commitmentsToIds');
   });
 
   it('declares the idsToCommitments ledger', () => {
     const result = generateCompact(minimalScript);
-    expect(result).toContain('export ledger idsToCommitments');
+    expect(result).toContain('ledger idsToCommitments');
   });
 
   it('declares the localSecret witness', () => {
