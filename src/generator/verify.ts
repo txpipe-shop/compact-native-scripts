@@ -3,20 +3,6 @@ import { formatBytes, collectUniquePaths } from './utils.js';
 import type { CmtLeaf } from './utils.js';
 
 /**
- * Generates all k-sized combinations from an array.
- *
- * @param arr - Source elements
- * @param k - Size of each combination
- * @returns Array of combinations
- */
-function combinations<T>(arr: T[], k: number): T[][] {
-  if (k === 0) return [[]];
-  if (arr.length < k) return [];
-  const [first, ...rest] = arr;
-  return [...combinations(rest, k - 1).map((c) => [first, ...c]), ...combinations(rest, k)];
-}
-
-/**
  * Result of recursively generating a Compact expression from a script subtree.
  *
  * @property expr - Variable name that holds this subtree's result
@@ -31,7 +17,7 @@ type GenResult = {
  * Recursively generates Compact expressions for a native script subtree.
  *
  * Walks the tree and emits constraint expressions for commitment lookups,
- * time-lock checks, and combinators (`any`/`all`/`atLeast`).
+ * time-lock checks, and combinators (`any`, `all`, `atLeast`).
  *
  * @param script - Script subtree to generate expressions for
  * @param path - Dot-separated tree path identifying this node's position
@@ -57,8 +43,14 @@ function genExpr(script: NativeScriptSchema, path: string): GenResult {
         lines: [`const id_${path} = blockTimeLt(${script.block});`],
       };
     }
-    case 'any':
-    case 'all':
+    /**
+     * Generates a linear counter sum for atLeast N-of-M conditions.
+     *
+     * Each child expression is converted to a boolean via ternary (`? 1 : 0`),
+     * summed with `+`, and compared against the required threshold.
+     * This is O(n) in the number of children, avoiding the combinatorial
+     * explosion of generating all k-combinations.
+     */
     case 'atLeast': {
       const children: GenResult[] = [];
       const inlineExprs: string[] = [];
@@ -86,18 +78,40 @@ function genExpr(script: NativeScriptSchema, path: string): GenResult {
       const parts = [...inlineExprs, ...children.map((c) => c.expr)];
       if (parts.length === 0) return { expr: '', lines };
 
-      let combined: string;
+      const sum = parts.map((p) => `(${p} ? 1 : 0)`).join(' + ');
+      lines.push(`const id_${path} = (${sum}) >= ${script.required};`);
+      return { expr: `id_${path}`, lines };
+    }
+    case 'any':
+    case 'all': {
+      const children: GenResult[] = [];
+      const inlineExprs: string[] = [];
+      const lines: string[] = [];
 
-      if (script.type === 'atLeast') {
-        combined = combinations(parts, script.required)
-          .map((c) => `(${c.join(' && ')})`)
-          .join(' || ');
-      } else {
-        const op = script.type === 'all' ? ' && ' : ' || ';
-        combined = parts.join(op);
+      for (let i = 0; i < script.scripts.length; i++) {
+        const child = script.scripts[i];
+        if (child.type === 'cmt') {
+          const hash = formatBytes(child.hash);
+          const id = formatBytes(path.padEnd(8));
+          inlineExprs.push(`idsToCommitments.lookup(${id}).member(${hash})`);
+        } else if (child.type === 'after') {
+          inlineExprs.push(`blockTimeGte(${child.block})`);
+        } else if (child.type === 'before') {
+          inlineExprs.push(`blockTimeLt(${child.block})`);
+        } else if (child.type === 'any' || child.type === 'all' || child.type === 'atLeast') {
+          const childPath = path ? `${path}_${i}` : `${i}`;
+          const childResult = genExpr(child, childPath);
+          if (childResult.expr === '') continue;
+          children.push(childResult);
+          lines.push(...childResult.lines);
+        }
       }
 
-      lines.push(`const id_${path} = ${combined};`);
+      const parts = [...inlineExprs, ...children.map((c) => c.expr)];
+      if (parts.length === 0) return { expr: '', lines };
+
+      const op = script.type === 'all' ? ' && ' : ' || ';
+      lines.push(`const id_${path} = ${parts.join(op)};`);
       return { expr: `id_${path}`, lines };
     }
   }

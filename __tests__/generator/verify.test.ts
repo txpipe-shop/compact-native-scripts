@@ -12,6 +12,13 @@ const cmtHexSet = new Set(
   cmtLeaves.flatMap((l) => l.hashes).map((h) => Buffer.from(h).toString('hex'))
 );
 const matchingPairs = secretPairs.filter((p: any) => cmtHexSet.has(p.commitment));
+const isAtLeast = input.type === 'atLeast';
+const atLeastRequired = isAtLeast ? input.required : 0;
+const isFlatAtLeast =
+  isAtLeast &&
+  (input.scripts as NativeScriptSchema[]).every(
+    (c) => c.type === 'cmt' || c.type === 'after' || c.type === 'before'
+  );
 
 function hasTimeLocks(script: NativeScriptSchema): boolean {
   if (script.type === 'after' || script.type === 'before') return true;
@@ -134,6 +141,109 @@ describe('Verify circuit', () => {
           .sort();
         expect(after).toEqual(before[p]);
       }
+    }
+  );
+
+  it.runIf(isFlatAtLeast && matchingPairs.length >= atLeastRequired)(
+    'atLeast: passes when exactly required number of commitments are committed',
+    () => {
+      const sim = new WardenSimulator();
+      sim.init();
+      for (const { secret, randomness } of matchingPairs.slice(0, atLeastRequired)) {
+        sim.commitWith(
+          new Uint8Array(Buffer.from(secret, 'hex')),
+          new Uint8Array(Buffer.from(randomness, 'hex'))
+        );
+      }
+      expect(() => sim.verify()).not.toThrow();
+    }
+  );
+
+  it.runIf(isFlatAtLeast && matchingPairs.length > atLeastRequired)(
+    'atLeast: passes when more than required number are committed',
+    () => {
+      const sim = new WardenSimulator();
+      sim.init();
+      for (const { secret, randomness } of matchingPairs) {
+        sim.commitWith(
+          new Uint8Array(Buffer.from(secret, 'hex')),
+          new Uint8Array(Buffer.from(randomness, 'hex'))
+        );
+      }
+      expect(() => sim.verify()).not.toThrow();
+    }
+  );
+
+  it.runIf(isFlatAtLeast && atLeastRequired > 1 && matchingPairs.length >= atLeastRequired)(
+    'atLeast: fails when fewer than required are committed',
+    () => {
+      const sim = new WardenSimulator();
+      sim.init();
+      for (const { secret, randomness } of matchingPairs.slice(0, atLeastRequired - 1)) {
+        sim.commitWith(
+          new Uint8Array(Buffer.from(secret, 'hex')),
+          new Uint8Array(Buffer.from(randomness, 'hex'))
+        );
+      }
+      expect(() => sim.verify()).toThrow();
+    }
+  );
+
+  it.runIf(isAtLeast && hasCmt)('atLeast: fails when no commitments are committed', () => {
+    const sim = new WardenSimulator();
+    sim.init();
+    expect(() => sim.verify()).toThrow('Commitments or time-lock conditions not satisfied');
+  });
+
+  it.runIf(isAtLeast)('atLeast: fails on uninitialized contract', () => {
+    const sim = new WardenSimulator();
+    expect(() => sim.verify()).toThrow();
+  });
+
+  it.runIf(isFlatAtLeast && matchingPairs.length >= atLeastRequired)(
+    'atLeast: cleans up idsToCommitments after successful verify',
+    () => {
+      const sim = new WardenSimulator();
+      sim.init();
+      for (const { secret, randomness } of matchingPairs.slice(0, atLeastRequired)) {
+        sim.commitWith(
+          new Uint8Array(Buffer.from(secret, 'hex')),
+          new Uint8Array(Buffer.from(randomness, 'hex'))
+        );
+      }
+
+      const paths = [...new Set(cmtLeaves.map((l) => l.path))];
+      for (const p of paths) {
+        expect(
+          (sim.getLedger() as any).idsToCommitments.lookup(Buffer.from(p.padEnd(8))).isEmpty()
+        ).toBe(false);
+      }
+
+      expect(() => sim.verify()).not.toThrow();
+
+      for (const p of paths) {
+        expect(
+          (sim.getLedger() as any).idsToCommitments.lookup(Buffer.from(p.padEnd(8))).isEmpty()
+        ).toBe(true);
+      }
+    }
+  );
+
+  it.runIf(isAtLeast && hasTimeLocks(input))(
+    'atLeast: passes when time-lock conditions are met',
+    () => {
+      const sim = new WardenSimulator();
+      if (hasCmt) {
+        sim.init();
+        for (const { secret, randomness } of matchingPairs) {
+          sim.commitWith(
+            new Uint8Array(Buffer.from(secret, 'hex')),
+            new Uint8Array(Buffer.from(randomness, 'hex'))
+          );
+        }
+      }
+      sim.setBlockTime(400);
+      expect(() => sim.verify()).not.toThrow();
     }
   );
 });
