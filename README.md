@@ -37,11 +37,11 @@ There are two other core concerns as well: making the solution simple for the en
 
 The tool reads a JSON file describing the authorization policy (commitment hashes, time locks, composite conditions) and generates a Compact module called **Warden** with three exported circuits. See [docs/schema.md](docs/schema.md) for the complete schema design documentation, and [docs/design.md](docs/design.md) for a description of the generated Compact code and usage instructions.
 
-| Circuit | Purpose |
-|---------|---------|
-| `init()` | Initializes the on-ledger maps that encode the policy |
+| Circuit    | Purpose                                                                       |
+| ---------- | ----------------------------------------------------------------------------- |
+| `init()`   | Initializes the on-ledger maps that encode the policy                         |
 | `commit()` | A user registers their commitment (proves knowledge of a secret + randomness) |
-| `verify()` | Checks that the set of committed commitments satisfies the policy conditions |
+| `verify()` | Checks that the set of committed commitments satisfies the policy conditions  |
 
 Any contract that needs access control **imports** `Warden`, calls `init()` in its constructor, exposes `commit()` to participants, and calls `verify()` before any protected operation:
 
@@ -76,6 +76,7 @@ pnpm make-commitment -o my-pair.json
 ```
 
 Optional parameters:
+
 - `-s, --seed <hex>` — 64-character hex seed (deterministic secret generation)
 - `-o, --output <path>` — Path to write the result as JSON (if omitted, prints to stdout)
 
@@ -151,6 +152,7 @@ Equivalently, using the global CLI: `warden-tool generate-code -i script.json -o
 This creates `generated/Warden.compact` — a Compact module with the authorization logic baked in.
 
 Optional parameters:
+
 - `-o, --output <path>` — Output directory (default: `generated/`)
 - `-t, --test` — Include import/export boilerplate for unit testing
 
@@ -244,6 +246,7 @@ The top-level contract is **TokenSupply**, which exposes `mint` and `burn` circu
 The **initial policy** is an `all` of four commitments — all four must be registered before any mint/burn is allowed.
 
 The example includes:
+
 - **Contract** — `TokenSupply.compact` imports `Warden.compact` and wires the guards
 - **Witness + private state** — TypeScript implementations for `localSecret()` and `randomness()`
 - **Wallet** — Account setup and node connection via the Midnight Wallet SDK
@@ -257,5 +260,3 @@ See the [e2e README](e2e/README.md) for full setup and usage instructions.
 There are a few ideas on how the project can be improved. First, the inclusion of an "owner" that is the only one authorized to perform operations like initializing the contract and verifying. The current implementation allows anyone who can commit to call the other circuits, which is consistent with how multisignature scripts work in other blockchains. An optional owner role could be added for use cases that need a designated administrator.
 
 Another line of work is evaluating alternative implementations to guarantee the best performance.
-
-
