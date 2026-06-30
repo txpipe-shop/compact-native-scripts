@@ -63,7 +63,7 @@ This pure circuit generates a commitment from a given secret and randomness usin
 This circuit verifies that all expected conditions are met:
 
 - **Commitment clauses**:checks the commitments exist in the corresponding `idsToCommitments` set via `member()`.
-- **Time-lock clauses**: compares the current block height against the `after`/`before` thresholds using `blockTimeGte()` / `blockTimeLt()`.
+- **Time-lock clauses**: compares the current block's time against the `after`/`before` thresholds using `blockTimeGte()` / `blockTimeLt()`.
 - **Composite clauses**: combines child results with `&&` (all), `||` (any), or a summed ternary counter against the required threshold (`atLeast`).
 
 If the root condition passes, the circuit resets all `idsToCommitments` entries to their default (empty) state via `resetToDefault()`. This ensures the same verified state cannot be replayed.
@@ -78,7 +78,7 @@ When the input script contains only time-lock clauses (`after` / `before`) with 
 
 #### `verify` circuit
 
-This circuit checks only the time-lock conditions of the input script. It evaluates the clauses for the desired block height. On success, the circuit does not need to reset any state.
+This circuit checks only the time-lock conditions of the input script. It evaluates the clauses for the desired block time. On success, the circuit does not need to reset any state.
 
 ## Usage
 
