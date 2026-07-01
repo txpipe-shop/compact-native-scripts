@@ -1,70 +1,67 @@
-# Warden tool
+# Midnight: Warden Tool
 
-CLI-based application to generate compact code that checks commitments and time-lock conditions based on multisignature scripts. Accepts JSON inputs structured around Cardano native script patterns, supporting nested conditions (`any`, `all`, `atLeast`).
-
-The idea is that the CLI generates a Compact contract module that can be used to grant access to circuits based on a set of commitments. The contract has three exported circuits: `init`, `commit` and `verify`:
-
-- `init` is used to initalize the contract's state
-- `commit` is used by a user when it wants to add its commitment to the set to authorize a certain circuit running.
-- `verify` is used within a circuit to ensure that it will be run if and only if the set of commitments present satisfies the predefined assertions.
-  The predefined assertions are constructed based on Cardano native scripts.
+CLI-based code generation tool that produces a **reusable Compact access-control module** from JSON inputs modeled on Cardano native scripts. The generated `Warden.compact` can be imported by any Midnight contract to gate circuits behind multisig-equivalent authorization policies (commitment sets, time locks, and nested combinators).
 
 ## Table of Contents
 
-- [Warden tool](#warden-tool)
+- [Midnight: Warden Tool](#midnight-warden-tool)
   - [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Setup](#setup)
-    - [Install CLI globally](#install-cli-globally)
-  - [Documentation](#documentation)
+  - [Motivation](#motivation)
+  - [How It Works](#how-it-works)
+  - [Limitations](#limitations)
   - [Authorization workflow](#authorization-workflow)
     - [Participant](#participant)
     - [Script author](#script-author)
-  - [Commands](#commands)
-    - [Commitment generator](#commitment-generator)
-    - [Script wizard](#script-wizard)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+    - [Install CLI globally](#install-cli-globally)
   - [Usage](#usage)
-    - [Compact code generator](#compact-code-generator)
     - [Compile](#compile)
     - [Test](#test)
-  - [E2E example](#e2e-example)
+  - [E2E Example: TokenSupply](#e2e-example-tokensupply)
+  - [Future work](#future-work)
 
-## Prerequisites
+## Motivation
 
-- Compact Devtools 0.4.0 (check with `compact --version`)
-- Compact Toolchain 0.31.0 (check with `compact compile --version`)
-- PNPM 10.30.1
+It is desirable to have contracts in Midnight that handle multisignature scripts like in Cardano. In these scripts the authorization condition is that the transaction has signatures from multiple cryptographic keys, according to a requirement that can be "allOf", "anyOf" or "atLeastNOfM".
 
-## Setup
+The goal is to have Midnight contracts that provide access control to circuits following these well-known multisignature patterns. Whereas a common multisignature script involves multiple signatures being gathered on a single transaction before submission, an implementation in Midnight must be different because of the blockchain's own design and limitations.
 
-Install dependencies
+Midnight doesn't use signatures for transactions involving contracts, so instead the prototype is built on commitments. Commitments are a cryptographic primitive that allows one to commit to a value without revealing it.
 
-```bash
-pnpm install
+In other blockchains, multisignature scripts work by gathering signatures off-chain and submitting a single fully-signed transaction. In Midnight, proofs are what guarantee correctness when a transaction is submitted, but obtaining partial proofs is not feasible and also introduces a problem with the order of authorizations. This is why this implementation uses commitments instead of proofs: a user can commit in one transaction, and the contract later verifies that the required set of commitments has been accumulated across multiple transactions before allowing the protected operation.
+
+There are two other core concerns as well: making the solution simple for the end user, and engaging developers coming from the Cardano ecosystem. Because of these, the usage of this implementation is based on Cardano native scripts, which are scripts composed of clauses like `any`, `all` and `atLeastNOfM`, that refer to the signatures, `after` and `before`, which are time conditions, and regular signature expressions. These scripts can be written using JSON syntax, and the format used here is largely similar to the one accepted by the `cardano-cli` as described in IntersectMBO's Cardano node reference. This simplifies the input to lists of commitments and condition descriptors, and also provides familiarity for Cardano developers. Nevertheless, the usage is different since in Cardano native scripts create script addresses, and in this implementation the authorization functions are Compact circuits that have to be called from within other Compact contracts.
+
+## How It Works
+
+The tool reads a JSON file describing the authorization policy (commitment hashes, time locks, composite conditions) and generates a Compact module called **Warden** with three exported circuits. See [docs/schema.md](docs/schema.md) for the complete schema design documentation, and [docs/design.md](docs/design.md) for a description of the generated Compact code and usage instructions.
+
+| Circuit    | Purpose                                                                       |
+| ---------- | ----------------------------------------------------------------------------- |
+| `init()`   | Initializes the on-ledger maps that encode the policy                         |
+| `commit()` | A user registers their commitment (proves knowledge of a secret + randomness) |
+| `verify()` | Checks that the set of committed commitments satisfies the policy conditions  |
+
+Any contract that needs access control **imports** `Warden`, calls `init()` in its constructor, exposes `commit()` to participants, and calls `verify()` before any protected operation:
+
+```compact
+import "generated/Warden" prefix Warden_;
+
+constructor() {
+  Warden_init();
+  // ... other initialization logic
+}
+
+export circuit protectedAction(): [] {
+  Warden_verify();
+  // ... application logic
+}
 ```
 
-### Install CLI globally
+## Limitations
 
-Build the project, then register the `warden-tool` binary on your PATH:
-
-```bash
-pnpm build
-pnpm link --global
-```
-
-Now `warden-tool` is available as a system-wide command:
-
-```bash
-warden-tool --help
-warden-tool generate-code -i <input-file>
-warden-tool make-commitment -s <seed>
-```
-
-> **Note:** `pnpm link --global` creates a symlink to your local build. After pulling changes or rebuilding, the command reflects updates automatically.
-
-## Documentation
-
-See [docs/schema.md](docs/schema.md) for the complete schema design documentation, and [docs/design.md](docs/design.md) for a description of the Compact code that the CLI generates and usage instructions.
+The compilation of Compact code creates some restrictions: the circuits are compiled into fixed ZK circuits, so every aspect must be determined at compile time. Because of this, abstract data structures with arbitrary or undetermined values are not accepted. Our workaround for these constraints was to hard code the clauses and expected commitments into the circuits. This represents a limitation because the conditions and commitments cannot be changed without recompiling and redeploying the contract.
 
 ## Authorization workflow
 
@@ -77,6 +74,11 @@ Each person who needs to authorize operations runs `make-commitment` to generate
 ```bash
 pnpm make-commitment -o my-pair.json
 ```
+
+Optional parameters:
+
+- `-s, --seed <hex>` — 64-character hex seed (deterministic secret generation)
+- `-o, --output <path>` — Path to write the result as JSON (if omitted, prints to stdout)
 
 This produces a file like:
 
@@ -114,7 +116,7 @@ Commitments from participants     Native script definition
 
 **Step 1 — Collect commitments**
 
-Ask each participant to run `make-commitment` and share the `commitment` hex with you.
+Ask each participant to run `pnpm make-commitment` (or `warden-tool make-commitment`) and share the `commitment` hex with you.
 
 **Step 2 — Build the native script**
 
@@ -124,6 +126,7 @@ Write a JSON file describing the authorization conditions. You can either:
   ```bash
   pnpm script-wizard
   ```
+  Walks through script node types — commitment (`cmt`), time locks (`after`/`before`), and composites (`any`/`all`/`atLeast`) — and writes the result to a JSON file (defaults to `script.json`).
 - Write the JSON manually (see [the schema docs](docs/schema.md) and the [examples directory](examples/inputs/)).
 
 The script references each commitment by its hex hash:
@@ -144,7 +147,14 @@ The script references each commitment by its hex hash:
 pnpm generate-code -i script.json -o generated/
 ```
 
+Equivalently, using the global CLI: `warden-tool generate-code -i script.json -o generated/`
+
 This creates `generated/Warden.compact` — a Compact module with the authorization logic baked in.
+
+Optional parameters:
+
+- `-o, --output <path>` — Output directory (default: `generated/`)
+- `-t, --test` — Include import/export boilerplate for unit testing
 
 **Step 4 — Import into your project**
 
@@ -154,51 +164,40 @@ import "generated/Warden";
 
 Use `verify()` as a guard before any protected operation.
 
-## Commands
+## Prerequisites
 
-### Commitment generator
+- Compact Devtools 0.4.0 (check with `compact --version`)
+- Compact Toolchain 0.31.0 (check with `compact compile --version`)
+- PNPM 10.30.1
 
-```bash
-pnpm make-commitment -s <seed_hex> -o <output-file>
-```
+## Setup
 
-Generates a SecretPair comprised of a `secret` and a `randomness`, and the corresponding `commitment` product of these two.
-Optional parameters are:
-
-- -s, --seed <hex> 64-character hex seed for the secret
-- -o, --output <path> Path to write the result as JSON
-
-### Script wizard
+Install dependencies
 
 ```bash
-pnpm script-wizard
+pnpm install
 ```
 
-Launches an interactive wizard that builds a native script schema JSON file
-that can be used as input to the `generate-code` command.
-Walks through script node types — commitment (`cmt`), time locks (`after`/`before`),
-and composites (`any`/`all`/`atLeast`) — and writes the result to a JSON file
-(defaults to `script.json`).
-Ensure all commitments required have been gathered prior to running this command.
+### Install CLI globally
+
+Build the project, then register the `warden-tool` binary on your PATH:
+
+```bash
+pnpm build
+pnpm link --global
+```
+
+Now `warden-tool` is available as a system-wide command:
+
+```bash
+warden-tool --help
+warden-tool generate-code -i <input-file>
+warden-tool make-commitment -s <seed>
+```
+
+> **Note:** `pnpm link --global` creates a symlink to your local build. After pulling changes or rebuilding, the command reflects updates automatically.
 
 ## Usage
-
-### Compact code generator
-
-```bash
-pnpm generate-code -i <input-file>
-pnpm generate-code -i <input-file> -o <output-dir>
-pnpm generate-code -i <input-file> -o <output-dir> -t
-```
-
-Generates a Compact contract module (`Warden.compact`) from a JSON input file.
-The input file defines the script tree (commitment hashes, composite conditions,
-time locks) following the schema documented below.
-
-Optional parameters are:
-
-- `-o, --output <path>` Directory to write the generated Compact code (default: `generated/`)
-- `-t, --test` Include import/export boilerplate for unit testing
 
 ### Compile
 
@@ -206,7 +205,12 @@ Optional parameters are:
 pnpm compact
 ```
 
-Compiles the generated Compact code and writes the artifacts into `generated/managed`.
+Compiles `generated/Warden.compact` and writes the artifacts into `generated/managed`.
+To compile from or to a different location, use `compact compile` directly:
+
+```bash
+compact compile path/to/Contract.compact path/to/output-dir/contract
+```
 
 ### Test
 
@@ -222,11 +226,37 @@ To use another example, the command must be run like:
 TEST_INPUT=examples/inputs/<example.json> pnpm test
 ```
 
-## E2E example
+## E2E Example: TokenSupply
 
-A complete [end-to-end example](e2e/) demonstrating Warden in action — a token
-supply contract that uses Warden to gate mint and burn operations by an
-authorization policy (any, all, atLeast, time locks, or combinations).
+A complete end-to-end example demonstrating how any application contract can import and use the Warden access-control module.
 
-The flow: **deploy** → participants **commit** → **mint/burn** guarded by
-`verify()`. See the [e2e README](e2e/README.md) for setup and usage.
+The top-level contract is **TokenSupply**, which exposes `mint` and `burn` circuits. Both call `Warden_verify()` to check that the required ledger commitments satisfy the configured policy before proceeding. This separation keeps the application logic entirely agnostic to the authorization strategy.
+
+**Authorization flow:**
+
+```
+  1. Deploy:    TokenSupply.constructor()  →  Warden.init() populates authorized users
+  2. Commit:    Users call TokenSupply.commit() which delegates to Warden.commit()
+                to register their secret commitments on-ledger
+  3. Mint/Burn: TokenSupply.mint(amount, recipient) calls Warden_verify() internally.
+                Only if the committed users satisfy the native script policy
+                does the mint proceed
+```
+
+The **initial policy** is an `all` of four commitments — all four must be registered before any mint/burn is allowed.
+
+The example includes:
+
+- **Contract** — `TokenSupply.compact` imports `Warden.compact` and wires the guards
+- **Witness + private state** — TypeScript implementations for `localSecret()` and `randomness()`
+- **Wallet** — Account setup and node connection via the Midnight Wallet SDK
+- **API** — Layer that wraps deployment, commit, mint, burn, and state observation
+- **CLI** — Interactive menu to drive the dApp end-to-end on a local devnet or Midnight Preview testnet
+
+See the [e2e README](e2e/README.md) for full setup and usage instructions.
+
+## Future work
+
+There are a few ideas on how the project can be improved. First, the inclusion of an "owner" that is the only one authorized to perform operations like initializing the contract and verifying. The current implementation allows anyone who can commit to call the other circuits, which is consistent with how multisignature scripts work in other blockchains. An optional owner role could be added for use cases that need a designated administrator.
+
+Another line of work is evaluating alternative implementations to guarantee the best performance.
