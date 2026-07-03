@@ -2,6 +2,10 @@
   "type": "all",
   "scripts": [
     {
+      "type": "after",
+      "block": 1
+    },
+    {
       "type": "before",
       "block": 1000
     },
