@@ -1,5 +1,7 @@
 # Midnight: Warden Tool
 
+> **⚠️ Not production-ready — expect breaking changes as we iterate.**
+
 CLI-based code generation tool that produces a **reusable Compact access-control module** from JSON inputs modeled on Cardano native scripts. The generated `Warden.compact` can be imported by any Midnight contract to gate circuits behind multisig-equivalent authorization policies (commitment sets, time locks, and nested combinators).
 
 ## Table of Contents
@@ -225,6 +227,8 @@ To use another example, the command must be run like:
 ```bash
 TEST_INPUT=examples/inputs/<example.json> pnpm test
 ```
+
+The test suite uses hardcoded block times (400 for pass, 0 for fail). Modifying the `block` values in example inputs may cause tests to break unless the test values are adjusted accordingly.
 
 ## E2E Example: TokenSupply
 
