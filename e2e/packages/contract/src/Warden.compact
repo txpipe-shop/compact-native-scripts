@@ -82,6 +82,9 @@ module Warden {
    * has to call before execution.
    */
   export circuit verify(): [] {
+    assert(!commitmentsToIds.isEmpty(), "Cannot verify on uninitialized contract");
+    const commitment = getCommitment(localSecret(), randomness());
+    assert(commitmentsToIds.member(commitment), "This key is not authorized to verify this contract");
     const id_0 = idsToCommitments.lookup(Bytes[48, 32, 32, 32, 32, 32, 32, 32]).member(Bytes[33, 243, 20, 227, 103, 145, 101, 242, 52, 254, 138, 152, 111, 96, 210, 160, 48, 142, 75, 132, 100, 21, 254, 104, 244, 191, 157, 61, 25, 78, 167, 76]) && idsToCommitments.lookup(Bytes[48, 32, 32, 32, 32, 32, 32, 32]).member(Bytes[149, 23, 220, 185, 134, 218, 24, 9, 150, 136, 232, 139, 111, 225, 252, 229, 104, 253, 14, 235, 125, 219, 186, 134, 168, 38, 61, 196, 137, 248, 87, 131]) && idsToCommitments.lookup(Bytes[48, 32, 32, 32, 32, 32, 32, 32]).member(Bytes[218, 109, 66, 193, 31, 92, 165, 54, 244, 19, 73, 125, 142, 142, 189, 62, 100, 215, 139, 221, 128, 226, 31, 88, 121, 83, 125, 126, 169, 75, 21, 131]) && idsToCommitments.lookup(Bytes[48, 32, 32, 32, 32, 32, 32, 32]).member(Bytes[46, 157, 1, 151, 153, 180, 217, 59, 241, 204, 104, 200, 17, 156, 21, 76, 196, 231, 248, 20, 116, 63, 34, 1, 182, 183, 248, 168, 137, 123, 79, 225]);
     assert(id_0, "Commitments or time-lock conditions not satisfied");
     idsToCommitments.lookup(Bytes[48, 32, 32, 32, 32, 32, 32, 32]).resetToDefault();
