@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 import { NativeScriptSchema, collectCmtLeaves } from '../../src/index.js';
 import { WardenSimulator } from './warden-simulator.js';
+import { PrivateState } from './witnesses.js';
 
 const input = NativeScriptSchema.parse(JSON.parse(readFileSync(process.env.TEST_INPUT!, 'utf-8')));
 const cmtLeaves = collectCmtLeaves(input);
@@ -47,10 +48,29 @@ describe('Verify circuit', () => {
     expect(() => sim.verify()).toThrow();
   });
 
+  it.runIf(hasCmt)('fails when verifying with an unauthorized key', () => {
+    const sim = new WardenSimulator();
+    sim.init();
+    for (const { secret, randomness } of matchingPairs) {
+      sim.commitWith(
+        new Uint8Array(Buffer.from(secret, 'hex')),
+        new Uint8Array(Buffer.from(randomness, 'hex'))
+      );
+    }
+    sim.contract.context = {
+      ...sim.contract.context,
+      currentPrivateState: {
+        secret: new Uint8Array(32).fill(42),
+        randomness: new Uint8Array(32).fill(99),
+      } as PrivateState,
+    };
+    expect(() => sim.verify()).toThrow('This key is not authorized to verify this contract');
+  });
+
   it.runIf(hasCmt && !hasTimeLocks(input))('fails when no commitments are committed', () => {
     const sim = new WardenSimulator();
     sim.init();
-    expect(() => sim.verify()).toThrow('Commitments or time-lock conditions not satisfied');
+    expect(() => sim.verify()).toThrow('This key is not authorized to verify this contract');
   });
 
   it.runIf(hasTimeLocks(input))('passes when current block meets time-lock conditions', () => {
@@ -185,14 +205,14 @@ describe('Verify circuit', () => {
           new Uint8Array(Buffer.from(randomness, 'hex'))
         );
       }
-      expect(() => sim.verify()).toThrow();
+      expect(() => sim.verify()).toThrow('Commitments or time-lock conditions not satisfied');
     }
   );
 
   it.runIf(isAtLeast && hasCmt)('atLeast: fails when no commitments are committed', () => {
     const sim = new WardenSimulator();
     sim.init();
-    expect(() => sim.verify()).toThrow('Commitments or time-lock conditions not satisfied');
+    expect(() => sim.verify()).toThrow('This key is not authorized to verify this contract');
   });
 
   it.runIf(isAtLeast)('atLeast: fails on uninitialized contract', () => {
