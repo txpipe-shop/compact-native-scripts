@@ -135,7 +135,17 @@ export function verifyCircuitBody(script: NativeScriptSchema, cmtLeaves: CmtLeaf
   const cleanup = paths
     .map((p) => `idsToCommitments.lookup(${formatBytes(p.padEnd(8))}).resetToDefault();`)
     .join('\n');
+
+  let preamble = '';
+  if (cmtLeaves.length > 0) {
+    preamble =
+      'assert(!commitmentsToIds.isEmpty(), "Cannot verify on uninitialized contract");\n' +
+      'const commitment = getCommitment(localSecret(), randomness());\n' +
+      'assert(commitmentsToIds.member(commitment), "This key is not authorized to verify this contract");\n';
+  }
+
   return (
+    preamble +
     result.lines.join('\n') +
     '\nassert(id_0, "Commitments or time-lock conditions not satisfied");\n' +
     (cleanup ? cleanup + '\n' : '')
