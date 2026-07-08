@@ -108,6 +108,16 @@ const main = async () => {
   await sleep(SYNC_DELAY_MS);
   console.info('');
 
+  // Unrecognized wallet tries to mint
+  try {
+    const providersE = await configureProviders(ctxE, config, 'token-supply-contract-e');
+    const contractE = await TokenSupplyContract.join(providersE, contractAddress, seeds[4].pair);
+    await contractE.mint(MINT_AMOUNT, ctxE.shieldedSecretKeys.coinPublicKey);
+  } catch (e) {
+    console.warn('Wallet E mint rejected (expected): %s', (e as Error).message);
+  }
+  console.info('');
+
   // Any wallet can mint after the warden conditions are met
   console.info('Minting...');
   await contractB.mint(MINT_AMOUNT, ctxB.shieldedSecretKeys.coinPublicKey);
