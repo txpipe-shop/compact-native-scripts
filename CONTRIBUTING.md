@@ -55,6 +55,7 @@ how something is implemented in a feature idea or bug ticket beforehand.
 ### Building & Testing
 
 The prerequisites to run this project are:
+
 - Compact Devtools 0.4.0 (check with `compact --version`)
 - Compact Toolchain 0.31.0 (check with `compact compile --version`)
 - PNPM 10.30.1
