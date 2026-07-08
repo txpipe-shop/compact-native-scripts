@@ -1,5 +1,9 @@
 # Midnight: Warden Tool
 
+[![CI](https://github.com/txpipe-shop/compact-native-scripts/actions/workflows/lint.yml/badge.svg)](https://github.com/txpipe-shop/compact-native-scripts/actions/workflows/lint.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+
 > **⚠️ Not production-ready — expect breaking changes as we iterate.**
 
 CLI-based code generation tool that produces a **reusable Compact access-control module** from JSON inputs modeled on Cardano native scripts. The generated `Warden.compact` can be imported by any Midnight contract to gate circuits behind multisig-equivalent authorization policies (commitment sets, time locks, and nested combinators).
@@ -261,7 +265,7 @@ See the [e2e README](e2e/README.md) for full setup and usage instructions.
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on bug reports, feature ideas, pull requests, and development setup.
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on bug reports, feature ideas, pull requests, and development setup. See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
 
 ## Future work
 
