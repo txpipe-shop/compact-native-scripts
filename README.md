@@ -259,6 +259,10 @@ The example includes:
 
 See the [e2e README](e2e/README.md) for full setup and usage instructions.
 
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on bug reports, feature ideas, pull requests, and development setup.
+
 ## Future work
 
 There are a few ideas on how the project can be improved. First, the inclusion of an "owner" that is the only one authorized to perform operations like initializing the contract and verifying. The current implementation allows anyone who can commit to call the other circuits, which is consistent with how multisignature scripts work in other blockchains. An optional owner role could be added for use cases that need a designated administrator.
