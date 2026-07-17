@@ -9,11 +9,11 @@ import { Config } from './types.js';
 export const createConfiguration = (config: Config): DefaultConfiguration => ({
   networkId: config.networkId,
   indexerClientConnection: {
-    indexerHttpUrl: 'http://localhost:8088/api/v3/graphql',
-    indexerWsUrl: 'ws://localhost:8088/api/v3/graphql/ws',
+    indexerHttpUrl: config.indexer,
+    indexerWsUrl: config.indexerWS,
   },
-  provingServerUrl: new URL('http://localhost:6300'),
-  relayURL: new URL('ws://localhost:9944'),
+  provingServerUrl: new URL(config.proofServer),
+  relayURL: new URL(config.node),
   costParameters: {
     additionalFeeOverhead: 300_000_000_000_000n,
     feeBlocksMargin: 5,

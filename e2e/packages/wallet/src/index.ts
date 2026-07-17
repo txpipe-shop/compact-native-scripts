@@ -24,7 +24,7 @@ export const buildWalletAndWaitForFunds = async (
   seed: string,
   wait: boolean = true
 ): Promise<WalletContext> => {
-  setNetworkId('undeployed');
+  setNetworkId(config.networkId);
 
   // Derive HD keys and initialize the three sub-wallets
   const { wallet, shieldedSecretKeys, dustSecretKey, unshieldedKeystore } = await withStatus(
@@ -36,7 +36,7 @@ export const buildWalletAndWaitForFunds = async (
       const unshieldedKeystore = createKeystore(keys[Roles.NightExternal], getNetworkId());
 
       const wallet = await WalletFacade.init({
-        configuration: createConfiguration(),
+        configuration: createConfiguration(config),
         shielded: (cfg) => ShieldedWallet(cfg).startWithSecretKeys(shieldedSecretKeys),
         unshielded: (cfg) =>
           UnshieldedWallet(cfg).startWithPublicKey(PublicKey.fromKeyStore(unshieldedKeystore)),

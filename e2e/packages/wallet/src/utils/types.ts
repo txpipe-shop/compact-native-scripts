@@ -17,4 +17,6 @@ export interface Config {
   readonly indexerWS: string;
   readonly node: string;
   readonly proofServer: string;
+  readonly networkId: string;
+  readonly syncTimeoutMs?: number;
 }
