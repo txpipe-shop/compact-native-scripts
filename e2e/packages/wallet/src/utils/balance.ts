@@ -10,7 +10,7 @@ import type { FacadeState, WalletFacade } from '@midnight-ntwrk/wallet-sdk/facad
 import { Roles } from '@midnight-ntwrk/wallet-sdk/hd';
 import { createKeystore } from '@midnight-ntwrk/wallet-sdk/unshielded';
 import * as Rx from 'rxjs';
-import { deriveKeysFromSeed } from './index.js';
+import { deriveKeysFromSeed, isWalletSynced } from './index.js';
 
 export interface Balances {
   dust: bigint;
@@ -64,7 +64,7 @@ export async function getBalancesAndAddresses(
   wallet: WalletFacade,
   seed: string
 ): Promise<{ balances: Balances; addresses: Addresses }> {
-  const state = await Rx.firstValueFrom(wallet.state().pipe(Rx.filter((s) => s.isSynced)));
+  const state = await Rx.firstValueFrom(wallet.state().pipe(Rx.filter(isWalletSynced)));
   return {
     balances: getBalances(state),
     addresses: getAddresses(seed, state),

@@ -10,10 +10,11 @@ import * as Rx from 'rxjs';
 import {
   deriveKeysFromSeed,
   formatBalance,
+  isWalletSynced,
   registerForDustGeneration,
   signTransactionIntents,
+  syncWallet,
   waitForFunds,
-  waitForSync,
   withStatus,
 } from './utils/index.js';
 import { Config, WalletContext } from './utils/types.js';
@@ -53,7 +54,9 @@ export const buildWalletAndWaitForFunds = async (
   );
 
   // Wait for the wallet to sync with the network
-  const syncedState = await withStatus('Syncing with network', () => waitForSync(wallet));
+  const syncedState = await withStatus('Syncing with network', () =>
+    syncWallet(wallet, config.syncTimeoutMs)
+  );
 
   // Check if wallet has funds; if not, wait for incoming tokens
   const balance = syncedState.unshielded.balances[ledger.unshieldedToken().raw] ?? 0n;
@@ -79,7 +82,7 @@ export const buildWalletAndWaitForFunds = async (
 export const createWalletAndMidnightProvider = async (
   ctx: WalletContext
 ): Promise<WalletProvider & MidnightProvider> => {
-  const state = await Rx.firstValueFrom(ctx.wallet.state().pipe(Rx.filter((s) => s.isSynced)));
+  const state = await Rx.firstValueFrom(ctx.wallet.state().pipe(Rx.filter(isWalletSynced)));
 
   return {
     getCoinPublicKey() {
