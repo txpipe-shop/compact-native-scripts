@@ -5,8 +5,8 @@ import { buildWalletAndWaitForFunds } from '@e2e/wallet';
 import { StandaloneConfig } from './config.js';
 import { seeds } from './utils/constants.js';
 import { showBalances, sleep } from './utils/index.js';
-import { BlockHash } from '@midnight-ntwrk/wallet-sdk-indexer-client';
-import { QueryRunner } from '@midnight-ntwrk/wallet-sdk-indexer-client/effect';
+import { BlockHash } from '@midnight-ntwrk/wallet-sdk/indexer-client';
+import { QueryRunner } from '@midnight-ntwrk/wallet-sdk/indexer-client/effect';
 
 const config = new StandaloneConfig();
 
