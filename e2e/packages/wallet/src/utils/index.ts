@@ -1,8 +1,8 @@
-import { type UnshieldedKeystore } from '@midnight-ntwrk/wallet-sdk-unshielded-wallet';
+import { type UnshieldedKeystore } from '@midnight-ntwrk/wallet-sdk/unshielded';
 import * as ledger from '@midnight-ntwrk/ledger-v8';
-import { WalletFacade } from '@midnight-ntwrk/wallet-sdk-facade';
+import { FacadeState, WalletFacade } from '@midnight-ntwrk/wallet-sdk/facade';
 import * as Rx from 'rxjs';
-import { HDWallet, Roles } from '@midnight-ntwrk/wallet-sdk-hd';
+import { HDWallet, Roles } from '@midnight-ntwrk/wallet-sdk/hd';
 
 /**
  * Sign all unshielded offers in a transaction's intents, using the correct
@@ -63,7 +63,7 @@ export const registerForDustGeneration = async (
   wallet: WalletFacade,
   unshieldedKeystore: UnshieldedKeystore
 ): Promise<void> => {
-  const state = await Rx.firstValueFrom(wallet.state().pipe(Rx.filter((s) => s.isSynced)));
+  const state = await Rx.firstValueFrom(wallet.state().pipe(Rx.filter(isWalletSynced)));
 
   // Check if dust is already available (for example, from a previous designation)
   if (state.dust.availableCoins.length > 0) {
@@ -81,14 +81,10 @@ export const registerForDustGeneration = async (
   if (nightUtxos.length === 0) {
     // All coins already registered — just wait for dust to generate
     await withStatus('Waiting for dust tokens to generate', () =>
-      Rx.firstValueFrom(
-        wallet.state().pipe(
-          Rx.throttleTime(5_000),
-          Rx.filter((s) => s.isSynced),
-          Rx.filter((s) => s.dust.balance(new Date()) > 0n)
-        )
-      )
-    );
+      wallet.waitForGeneratedDust(nightUtxos, 1n, { timeoutMs: 60_000 })
+    ).catch(() => {
+      console.log('\n  ⚠ Dust generation timed out after 60s — you can check balances manually');
+    });
     return;
   }
 
@@ -107,31 +103,72 @@ export const registerForDustGeneration = async (
 
   // Wait for dust to actually generate (balance > 0), not just for coins to appear
   await withStatus('Waiting for dust tokens to generate', () =>
-    Rx.firstValueFrom(
-      wallet.state().pipe(
-        Rx.throttleTime(5_000),
-        Rx.filter((s) => s.isSynced),
-        Rx.filter((s) => s.dust.balance(new Date()) > 0n)
-      )
-    )
-  );
+    wallet.waitForGeneratedDust(nightUtxos, 1n, { timeoutMs: 60_000 })
+  ).catch(() => {
+    console.log('\n  ⚠ Dust generation timed out after 60s — you can check balances manually');
+  });
 };
 
+export function isProgressStrictlyComplete(progress: unknown): boolean {
+  if (!progress || typeof progress !== 'object') {
+    return false;
+  }
+  const candidate = progress as { isStrictlyComplete?: unknown };
+  if (typeof candidate.isStrictlyComplete !== 'function') {
+    return false;
+  }
+  return (candidate.isStrictlyComplete as () => boolean)();
+}
+
+export function isWalletSynced(state: FacadeState): boolean {
+  return (
+    isProgressStrictlyComplete(state.shielded.state.progress) &&
+    isProgressStrictlyComplete(state.unshielded.progress)
+  );
+}
+
 /** Wait until the wallet has fully synced with the network. Returns the synced state. */
-export const waitForSync = (wallet: WalletFacade) =>
-  Rx.firstValueFrom(
+export async function syncWallet(wallet: WalletFacade, timeout = 300_000): Promise<FacadeState> {
+  console.info('Syncing wallet...');
+  let emissionCount = 0;
+  return Rx.firstValueFrom(
     wallet.state().pipe(
-      Rx.throttleTime(5_000),
-      Rx.filter((state) => state.isSynced)
+      Rx.tap((state: FacadeState) => {
+        emissionCount++;
+        // Heartbeat every 200 updates so a long sync shows progress without flooding the console.
+        if (emissionCount % 200 === 0) {
+          const shielded = isProgressStrictlyComplete(state.shielded.state.progress);
+          const unshielded = isProgressStrictlyComplete(state.unshielded.progress);
+          const dust = isProgressStrictlyComplete(state.dust.state.progress);
+          console.info(
+            `Still syncing: shielded=${shielded}, unshielded=${unshielded}, dust=${dust}`
+          );
+        }
+      }),
+      // Wait for the shielded and unshielded channels to catch up. We do not gate
+      // on the dust channel here: on the public networks it may never report
+      // "strictly complete", which would hang this wait forever.
+      Rx.filter(
+        (state: FacadeState) =>
+          isProgressStrictlyComplete(state.shielded.state.progress) &&
+          isProgressStrictlyComplete(state.dust.state.progress) &&
+          isProgressStrictlyComplete(state.unshielded.progress)
+      ),
+      Rx.tap(() => console.info('Wallet synced.')),
+      Rx.timeout({
+        each: timeout,
+        with: () => Rx.throwError(() => new Error(`Wallet sync timed out after ${timeout}ms`)),
+      })
     )
   );
+}
 
 /** Wait until the wallet has a non-zero unshielded balance. Returns the balance. */
 export const waitForFunds = (wallet: WalletFacade): Promise<bigint> =>
   Rx.firstValueFrom(
     wallet.state().pipe(
       Rx.throttleTime(10_000),
-      Rx.filter((state) => state.isSynced),
+      Rx.filter(isWalletSynced),
       Rx.map((s) => s.unshielded.balances[ledger.unshieldedToken().raw] ?? 0n),
       Rx.filter((balance) => balance > 0n)
     )

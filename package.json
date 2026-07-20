@@ -49,7 +49,9 @@
   },
   "pnpm": {
     "overrides": {
-      "@midnight-ntwrk/wallet-sdk-address-format": "^3.1.2"
+      "@midnight-ntwrk/wallet-sdk-address-format": "^3.1.2",
+      "@midnight-ntwrk/wallet-sdk": "1.2.0",
+      "@midnight-ntwrk/wallet-sdk-utilities": "1.2.1"
     }
   }
 }

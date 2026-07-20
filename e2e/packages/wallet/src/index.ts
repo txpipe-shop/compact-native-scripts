@@ -1,23 +1,20 @@
 import * as ledger from '@midnight-ntwrk/ledger-v8';
 import { getNetworkId, setNetworkId } from '@midnight-ntwrk/midnight-js/network-id';
 import { type MidnightProvider, type WalletProvider } from '@midnight-ntwrk/midnight-js/types';
-import { DustWallet } from '@midnight-ntwrk/wallet-sdk-dust-wallet';
-import { WalletFacade } from '@midnight-ntwrk/wallet-sdk-facade';
-import { Roles } from '@midnight-ntwrk/wallet-sdk-hd';
-import { ShieldedWallet } from '@midnight-ntwrk/wallet-sdk-shielded';
-import {
-  createKeystore,
-  PublicKey,
-  UnshieldedWallet,
-} from '@midnight-ntwrk/wallet-sdk-unshielded-wallet';
+import { DustWallet } from '@midnight-ntwrk/wallet-sdk/dust';
+import { WalletFacade } from '@midnight-ntwrk/wallet-sdk/facade';
+import { Roles } from '@midnight-ntwrk/wallet-sdk/hd';
+import { ShieldedWallet } from '@midnight-ntwrk/wallet-sdk/shielded';
+import { createKeystore, PublicKey, UnshieldedWallet } from '@midnight-ntwrk/wallet-sdk/unshielded';
 import * as Rx from 'rxjs';
 import {
   deriveKeysFromSeed,
   formatBalance,
+  isWalletSynced,
   registerForDustGeneration,
   signTransactionIntents,
+  syncWallet,
   waitForFunds,
-  waitForSync,
   withStatus,
 } from './utils/index.js';
 import { Config, WalletContext } from './utils/types.js';
@@ -28,7 +25,7 @@ export const buildWalletAndWaitForFunds = async (
   seed: string,
   wait: boolean = true
 ): Promise<WalletContext> => {
-  setNetworkId('undeployed');
+  setNetworkId(config.networkId);
 
   // Derive HD keys and initialize the three sub-wallets
   const { wallet, shieldedSecretKeys, dustSecretKey, unshieldedKeystore } = await withStatus(
@@ -40,7 +37,7 @@ export const buildWalletAndWaitForFunds = async (
       const unshieldedKeystore = createKeystore(keys[Roles.NightExternal], getNetworkId());
 
       const wallet = await WalletFacade.init({
-        configuration: createConfiguration(),
+        configuration: createConfiguration(config),
         shielded: (cfg) => ShieldedWallet(cfg).startWithSecretKeys(shieldedSecretKeys),
         unshielded: (cfg) =>
           UnshieldedWallet(cfg).startWithPublicKey(PublicKey.fromKeyStore(unshieldedKeystore)),
@@ -57,7 +54,9 @@ export const buildWalletAndWaitForFunds = async (
   );
 
   // Wait for the wallet to sync with the network
-  const syncedState = await withStatus('Syncing with network', () => waitForSync(wallet));
+  const syncedState = await withStatus('Syncing with network', () =>
+    syncWallet(wallet, config.syncTimeoutMs)
+  );
 
   // Check if wallet has funds; if not, wait for incoming tokens
   const balance = syncedState.unshielded.balances[ledger.unshieldedToken().raw] ?? 0n;
@@ -83,7 +82,7 @@ export const buildWalletAndWaitForFunds = async (
 export const createWalletAndMidnightProvider = async (
   ctx: WalletContext
 ): Promise<WalletProvider & MidnightProvider> => {
-  const state = await Rx.firstValueFrom(ctx.wallet.state().pipe(Rx.filter((s) => s.isSynced)));
+  const state = await Rx.firstValueFrom(ctx.wallet.state().pipe(Rx.filter(isWalletSynced)));
 
   return {
     getCoinPublicKey() {
