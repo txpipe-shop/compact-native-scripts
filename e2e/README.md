@@ -9,12 +9,12 @@ atLeast, time locks, or combinations) without modifying the application logic.
 
 The example consists of the following packages:
 
-- **CLI**: CLI-based application to interact with the contract
+- **CLI**: Interactive menu to drive the contract end-to-end
 - **Contract**: Smart contract source code and utilities, comprised itself of two modules:
-  - **Warden** (`generated/Warden.compact`) — access-control library generated
+  - **Warden** (`packages/contract/src/Warden.compact`) — access-control library generated
     from a native-script JSON input. Manages commitments and verifies that the
     current set of committed users satisfies the configured policy.
-  - **TokenSupply** (`e2e/TokenSupply.compact`) — a token supply contract that imports Warden and
+  - **TokenSupply** (`packages/contract/src/TokenSupply.compact`) — a token supply contract that imports Warden and
     calls `Warden_verify()` before allowing `mint` or `burn`.
 - **API**: Classes and methods that interface the CLI and the compact contract.
 - **Wallet**: Wallet setup and utilities.
@@ -47,11 +47,17 @@ In the `e2e` directory, the following command compiles the contract and builds t
 pnpm build
 ```
 
-and before running the example, start the services that Midnight requires: a node and an indexer,
-to run the undeployed network, and the proof-server necessary for proof generation.
+Before running the example, start the local devnet services — a node, an indexer,
+and the proof server needed for proof generation:
 
 ```bash
 docker compose up -d
+```
+
+To start only the proof server (e.g. when connecting to a public network):
+
+```bash
+docker compose up proof-server
 ```
 
 After finishing, make sure to shut down the services.
@@ -60,9 +66,61 @@ After finishing, make sure to shut down the services.
 docker compose down --volumes
 ```
 
+## Environment configuration
+
+Before running the app, you need to set up an `.env` file at `packages/cli/.env`
+with your wallet and contract details, and the network configuration.
+
+Complete it with your wallet's mnemonic phrase, and the secret and randomness used
+to create the commitment that was provided to initialize the Warden contract.
+
+```env
+WALLET_MNEMONIC=<your mnemonic>
+WARDEN_SECRET=<your secret>
+WARDEN_RANDOMNESS=<your randomness>
+```
+
+When running on the local devnet, you can skip these values — the CLI offers
+preset wallet options (1 through 4) with built-in credentials.
+
+### Network
+
+Below are the templates to connect with different networks. For the latest testnet endpoints, see
+[Environments and endpoints](https://docs.midnight.network/relnotes/network).
+
+### Local devnet
+
+```env
+NETWORK_TYPE=undeployed
+NODE_URL=ws://127.0.0.1:9944
+INDEXER_URL=http://127.0.0.1:8088/api/v3/graphql
+INDEXER_WS_URL=ws://127.0.0.1:8088/api/v3/graphql/ws
+PROOF_SERVER_URL=http://127.0.0.1:6300
+```
+
+### Preview
+
+```env
+NETWORK_TYPE=preview
+NODE_URL=wss://rpc.preview.midnight.network/
+INDEXER_URL=https://indexer.preview.midnight.network/api/v4/graphql
+INDEXER_WS_URL=wss://indexer.preview.midnight.network/api/v4/graphql/ws
+PROOF_SERVER_URL=http://127.0.0.1:6300
+```
+
+### Preprod
+
+```env
+NETWORK_TYPE=preprod
+NODE_URL=wss://rpc.preprod.midnight.network/
+INDEXER_URL=https://indexer.preprod.midnight.network/api/v4/graphql
+INDEXER_WS_URL=wss://indexer.preprod.midnight.network/api/v4/graphql/ws
+PROOF_SERVER_URL=http://127.0.0.1:6300
+```
+
 ## Running the example
 
-In the [`e2e/packages/cli`](/e2e/packages/cli/) directory:
+In the [`packages/cli`](packages/cli/) directory:
 
 ```bash
 pnpm tsx src/index.ts
