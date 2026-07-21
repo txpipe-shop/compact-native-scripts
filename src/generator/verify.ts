@@ -140,7 +140,7 @@ export function verifyCircuitBody(script: NativeScriptSchema, cmtLeaves: CmtLeaf
   if (cmtLeaves.length > 0) {
     preamble =
       'assert(!commitmentsToIds.isEmpty(), "Cannot verify on uninitialized contract");\n' +
-      'const commitment = getCommitment(localSecret(), randomness());\n' +
+      'const commitment = getCommitment(wardenSecret(), wardenRandomness());\n' +
       'assert(commitmentsToIds.member(commitment), "This key is not authorized to verify this contract");\n';
   }
 
