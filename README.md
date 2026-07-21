@@ -256,7 +256,7 @@ The **initial policy** is an `all` of four commitments — all four must be regi
 The example includes:
 
 - **Contract** — `TokenSupply.compact` imports `Warden.compact` and wires the guards
-- **Witness + private state** — TypeScript implementations for `localSecret()` and `randomness()`
+- **Witness + private state** — TypeScript implementations for `wardenSecret()` and `wardenRandomness()`
 - **Wallet** — Account setup and node connection via the Midnight Wallet SDK
 - **API** — Layer that wraps deployment, commit, mint, burn, and state observation
 - **CLI** — Interactive menu to drive the dApp end-to-end on a local devnet or Midnight Preview testnet

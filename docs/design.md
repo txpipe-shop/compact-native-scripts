@@ -35,7 +35,7 @@ A single commitment hash may map to multiple path identifiers if it appears as a
 
 ### Witness
 
-The witness function `localSecret` fetches a secret `Bytes<32>` value from the wallet, and `randomness` fetches a specific random `Bytes<32>` value that was used when generating the initial commitment. These values will be used to recompute the commitment at execution time.
+The witness function `wardenSecret` fetches a secret `Bytes<32>` value from the wallet, and `wardenRandomness` fetches a specific random `Bytes<32>` value that was used when generating the initial commitment. These values will be used to recompute the commitment at execution time.
 
 ### Circuits
 
