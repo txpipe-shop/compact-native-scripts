@@ -38,9 +38,9 @@ describe('generateCompact', () => {
     expect(result).toContain('ledger idsToCommitments');
   });
 
-  it('declares the localSecret witness', () => {
+  it('declares the wardenSecret witness', () => {
     const result = generateCompact(minimalScript);
-    expect(result).toContain('witness localSecret');
+    expect(result).toContain('witness wardenSecret');
   });
 
   it('declares all three circuits', () => {
