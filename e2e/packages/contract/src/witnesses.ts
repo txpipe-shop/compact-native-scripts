@@ -12,18 +12,18 @@ export const createPrivateState = (secret: Uint8Array, randomness: Uint8Array): 
 });
 
 export type Witnesses<PrivateState> = {
-  localSecret(context: WitnessContext<Ledger, PrivateState>): [PrivateState, Uint8Array];
-  randomness(context: WitnessContext<Ledger, PrivateState>): [PrivateState, Uint8Array];
+  wardenSecret(context: WitnessContext<Ledger, PrivateState>): [PrivateState, Uint8Array];
+  wardenRandomness(context: WitnessContext<Ledger, PrivateState>): [PrivateState, Uint8Array];
 };
 
 export const witnesses = {
-  localSecret: ({
+  wardenSecret: ({
     privateState,
   }: WitnessContext<Ledger, PrivateState>): [PrivateState, Uint8Array] => [
     privateState,
     privateState.secret,
   ],
-  randomness: ({
+  wardenRandomness: ({
     privateState,
   }: WitnessContext<Ledger, PrivateState>): [PrivateState, Uint8Array] => [
     privateState,

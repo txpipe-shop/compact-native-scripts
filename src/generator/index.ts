@@ -73,7 +73,7 @@ export function generateCompact(
   witness wardenSecret(): Bytes<32>;
 
   /**
-   * @description Witness function to fetch the wardenRandomness that along with a secret
+   * @description Witness function to fetch the randomness that along with a secret
    * generates a specific commitment.
    */
   witness wardenRandomness(): Bytes<32>;
