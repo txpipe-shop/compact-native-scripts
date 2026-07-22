@@ -70,13 +70,13 @@ export function generateCompact(
    * @description Witness function to fetch a secret from the wallet.
    * This secret will be used to obtain the commitment.
    */
-  witness localSecret(): Bytes<32>;
+  witness wardenSecret(): Bytes<32>;
 
   /**
    * @description Witness function to fetch the randomness that along with a secret
    * generates a specific commitment.
    */
-  witness randomness(): Bytes<32>;
+  witness wardenRandomness(): Bytes<32>;
 `
     : '';
 
@@ -112,7 +112,7 @@ export function generateCompact(
    */
   export circuit commit(): [] {
     assert(!commitmentsToIds.isEmpty(), "Cannot commit to uninitialized contract");
-    const commitment = getCommitment(localSecret(), randomness());
+    const commitment = getCommitment(wardenSecret(), wardenRandomness());
     assert(commitmentsToIds.member(commitment), "This key is not authorized to commit in this contract");
     assert(!commitmentsToIds.lookup(commitment).isEmpty(), "Commitment ID set is empty");${formatCircuit(commitBody)}
   }

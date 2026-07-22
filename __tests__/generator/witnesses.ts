@@ -4,6 +4,9 @@ export type PrivateState = {
 };
 
 export const witnesses = {
-  localSecret: (ctx: any): [any, Uint8Array] => [ctx.privateState, ctx.privateState.secret],
-  randomness: (ctx: any): [any, Uint8Array] => [ctx.privateState, ctx.privateState.randomness],
+  wardenSecret: (ctx: any): [any, Uint8Array] => [ctx.privateState, ctx.privateState.secret],
+  wardenRandomness: (ctx: any): [any, Uint8Array] => [
+    ctx.privateState,
+    ctx.privateState.randomness,
+  ],
 };
