@@ -12,12 +12,15 @@ import { CmtLeaf, formatBytes, collectUniquePaths } from './utils.js';
  */
 export function commitCircuitBody(leaves: CmtLeaf[]): string {
   const uniquePaths = collectUniquePaths(leaves);
+  const insertLine = (path: string) => `idsToCommitments.lookup(${path}).insert(commitment);`;
+  const ifLine = (path: string) =>
+    `if (commitmentsToIds.lookup(commitment).member(${path})) { ${insertLine(path)} }`;
 
   return Array.from(uniquePaths)
     .map((path) => {
       const pathPayload = formatBytes(path.padEnd(8));
       return `assert(!idsToCommitments.lookup(${pathPayload}).member(commitment), "This commitment has already been registered");
-if (commitmentsToIds.lookup(commitment).member(${pathPayload})) { idsToCommitments.lookup(${pathPayload}).insert(commitment); }
+${uniquePaths.length == 1 ? insertLine(pathPayload) : ifLine(pathPayload)}
 `;
     })
     .join('');
