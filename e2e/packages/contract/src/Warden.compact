@@ -71,7 +71,7 @@ module Warden {
     assert(commitmentsToIds.member(commitment), "This key is not authorized to commit in this contract");
     assert(!commitmentsToIds.lookup(commitment).isEmpty(), "Commitment ID set is empty");
     assert(!idsToCommitments.lookup(Bytes[48, 32, 32, 32, 32, 32, 32, 32]).member(commitment), "This commitment has already been registered");
-    if (commitmentsToIds.lookup(commitment).member(Bytes[48, 32, 32, 32, 32, 32, 32, 32])) { idsToCommitments.lookup(Bytes[48, 32, 32, 32, 32, 32, 32, 32]).insert(commitment); }
+    idsToCommitments.lookup(Bytes[48, 32, 32, 32, 32, 32, 32, 32]).insert(commitment);
   }
 
   /**
