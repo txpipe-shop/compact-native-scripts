@@ -1,9 +1,9 @@
-import { InMemoryTransactionHistoryStorage } from '@midnight-ntwrk/wallet-sdk';
 import {
+  InMemoryTransactionHistoryStorage,
   DefaultConfiguration,
   mergeWalletEntries,
   WalletEntrySchema,
-} from '@midnight-ntwrk/wallet-sdk/facade';
+} from '@midnight-ntwrk/wallet-sdk';
 import { Config } from './types.js';
 
 export const createConfiguration = (config: Config): DefaultConfiguration => ({

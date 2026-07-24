@@ -5,10 +5,11 @@ import {
   ShieldedAddress,
   ShieldedCoinPublicKey,
   ShieldedEncryptionPublicKey,
-} from '@midnight-ntwrk/wallet-sdk/address-format';
-import type { FacadeState, WalletFacade } from '@midnight-ntwrk/wallet-sdk/facade';
-import { Roles } from '@midnight-ntwrk/wallet-sdk/hd';
-import { createKeystore } from '@midnight-ntwrk/wallet-sdk/unshielded';
+  type FacadeState,
+  type WalletFacade,
+  Roles,
+  createKeystore,
+} from '@midnight-ntwrk/wallet-sdk';
 import * as Rx from 'rxjs';
 import { deriveKeysFromSeed, isWalletSynced } from './index.js';
 

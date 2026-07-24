@@ -1,4 +1,4 @@
-import { CompiledContract } from '@midnight-ntwrk/compact-js';
+import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
 import { TokenSupplyContractConstructor, TokenSupplyContractType } from './types.js';
 import { witnesses } from './witnesses.js';
 
@@ -14,7 +14,7 @@ export const CompactCompiledContract = CompiledContract.make<TokenSupplyContract
   )
 );
 
-export { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
+export { type ContractAddress } from '@midnight-ntwrk/midnight-js-protocol/compact-runtime';
 export * from './managed/tokensupply/contract/index.js';
 export { createPrivateState, type PrivateState } from './witnesses.js';
 export { TokenSupplyContractPrivateStateKey } from './types.js';

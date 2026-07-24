@@ -10,9 +10,9 @@ import {
   type ContractAddress,
   type PrivateState,
 } from '@e2e/contract';
-import { fromHex } from '@midnight-ntwrk/compact-runtime';
+import { fromHex } from '@midnight-ntwrk/midnight-js-protocol/compact-runtime';
 import { firstValueFrom, map, type Observable } from 'rxjs';
-import { ShieldedCoinInfo } from '@midnight-ntwrk/ledger-v8';
+import { ShieldedCoinInfo } from '@midnight-ntwrk/midnight-js-protocol/ledger';
 
 /** Rolling 30-minute TTL for all transactions. */
 export const TTL = () => new Date(Date.now() + 30 * 60 * 1_000);
