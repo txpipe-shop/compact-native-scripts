@@ -61,6 +61,7 @@ program
       ctx.wallet.stop.bind(ctx.wallet)
     );
     rli.close();
+    process.exit(0);
   });
 
 program.parseAsync().catch((err) => {
