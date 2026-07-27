@@ -32,8 +32,31 @@ const main = async () => {
   await showBalances('Wallet C', ctxC, seeds[2].seed);
   await showBalances('Wallet D', ctxD, seeds[3].seed);
 
-  // Deploy contract
+  // Set up providers for wallet A (reused for failing tests and real deploy)
   const providersA = await configureProviders(ctxA, config, 'token-supply-contract-a');
+
+  // Demonstrate deploy validation: maxSupply must be > 0
+  try {
+    const invalidArgs: DeployArguments = {
+      maxSupply: 0n,
+      tokenDomain: Buffer.alloc(32, 'token-supply-contract'),
+      initNonce: crypto.getRandomValues(new Uint8Array(32)),
+    };
+    await TokenSupplyContract.deploy(providersA, invalidArgs, seeds[0].pair);
+  } catch (e) {
+    console.warn('Deploy with invalid maxSupply rejected (expected): %s', (e as Error).message);
+  }
+  console.info('');
+
+  // Demonstrate join validation: contractAddress must not be empty
+  try {
+    await TokenSupplyContract.join(providersA, '', seeds[0].pair);
+  } catch (e) {
+    console.warn('Join with empty address rejected (expected): %s', (e as Error).message);
+  }
+  console.info('');
+
+  // Deploy contract
 
   const args: DeployArguments = {
     maxSupply: MAX_SUPPLY,
