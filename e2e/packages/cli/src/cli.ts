@@ -3,7 +3,7 @@ import { StandaloneConfig } from './config.js';
 import { Interface } from 'readline/promises';
 import { CONTRACT_MENU_PROMPT, MAIN_MENU_PROMPT, SeedAndSecretPair } from './utils/constants.js';
 import { DeployArguments, TokenSupplyContract } from '@e2e/api';
-import { configureProviders } from '@e2e/contract/providers';
+import { configureProviders, type TokenSupplyContractProviders } from '@e2e/contract/providers';
 
 export async function runCli(
   config: StandaloneConfig,
@@ -15,7 +15,14 @@ export async function runCli(
 ): Promise<void> {
   let contract: TokenSupplyContract | null = null;
 
-  const providers = await configureProviders(ctx, config, 'token-supply-' + `[${index}]`);
+  let providers: TokenSupplyContractProviders;
+  try {
+    providers = await configureProviders(ctx, config, 'token-supply-' + `[${index}]`);
+  } catch (e) {
+    console.error('Failed to configure providers:', (e as Error).message);
+    process.exit(1);
+  }
+
   while (true) {
     const choice = await rli.question(MAIN_MENU_PROMPT);
 
@@ -26,10 +33,14 @@ export async function runCli(
           tokenDomain: Buffer.alloc(32, 'token-supply-contract'),
           initNonce: crypto.getRandomValues(new Uint8Array(32)),
         };
-        contract = await TokenSupplyContract.deploy(providers, args, details.pair);
-        console.log(
-          `[Contract Address]: ${contract.deployedContract?.deployTxData.public.contractAddress}`
-        );
+        try {
+          contract = await TokenSupplyContract.deploy(providers, args, details.pair);
+          console.log(
+            `[Contract Address]: ${contract.deployedContract?.deployTxData.public.contractAddress}`
+          );
+        } catch (e) {
+          console.log('Error deploying: ', (e as Error).message);
+        }
         break;
       }
       case '2':
@@ -46,8 +57,12 @@ export async function runCli(
         }
         break;
       case '3': {
-        const { balances, addresses } = await getBalancesAndAddresses(ctx.wallet, details.seed);
-        printBalances(balances, addresses);
+        try {
+          const { balances, addresses } = await getBalancesAndAddresses(ctx.wallet, details.seed);
+          printBalances(balances, addresses);
+        } catch (e) {
+          console.log('Error fetching balances: ', (e as Error).message);
+        }
         break;
       }
       case '4':
@@ -97,11 +112,19 @@ async function handleCircuits(
         }
         break;
       case '4':
-        await contract.getCurrentState();
+        try {
+          await contract.getCurrentState();
+        } catch (e) {
+          console.log('Error fetching state: ', (e as Error).message);
+        }
         break;
       case '5': {
-        const { balances, addresses } = await getBalancesAndAddresses(ctx.wallet, details.seed);
-        printBalances(balances, addresses);
+        try {
+          const { balances, addresses } = await getBalancesAndAddresses(ctx.wallet, details.seed);
+          printBalances(balances, addresses);
+        } catch (e) {
+          console.log('Error fetching balances: ', (e as Error).message);
+        }
         break;
       }
       case '6':
