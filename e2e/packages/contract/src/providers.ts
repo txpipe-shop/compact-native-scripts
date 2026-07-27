@@ -26,12 +26,17 @@ export const configureProviders = async (
   const zkConfigProvider = new NodeZkConfigProvider<TokenSupplyContractCircuitKeys>(
     contractConfig.zkConfigPath
   );
+  const storagePassword = process.env.MIDNIGHT_STORAGE_PASSWORD;
+  if (!storagePassword) {
+    throw new Error(
+      'MIDNIGHT_STORAGE_PASSWORD is not set. Set it in e2e/packages/cli/.env (see .env.example). ' +
+        'The level-private-state-provider requires it to encrypt private state on disk.',
+    );
+  }
   return {
     privateStateProvider: levelPrivateStateProvider<PrivateStateId>({
       privateStateStoreName: privateStateStoreName + '-midnight',
-      privateStoragePasswordProvider: function (): string | Promise<string> {
-        return 'MyM1dnightPassword!';
-      },
+      privateStoragePasswordProvider: () => storagePassword,
       accountId: walletCtx.shieldedSecretKeys.coinPublicKey,
     }),
     publicDataProvider: indexerPublicDataProvider(config.indexer, config.indexerWS),
