@@ -142,6 +142,9 @@ importers:
       '@midnight-ntwrk/midnight-js-protocol':
         specifier: 4.1.1
         version: 4.1.1
+      '@midnight-ntwrk/midnight-js-utils':
+        specifier: 4.1.1
+        version: 4.1.1
     devDependencies:
       typescript:
         specifier: ^6.0.3
