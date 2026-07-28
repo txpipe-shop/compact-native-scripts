@@ -1,4 +1,4 @@
-import { WitnessContext } from '@midnight-ntwrk/compact-runtime';
+import { WitnessContext } from '@midnight-ntwrk/midnight-js-protocol/compact-runtime';
 import { Ledger } from './managed/tokensupply/contract/index.js';
 
 export type PrivateState = {

@@ -68,18 +68,12 @@ importers:
       '@e2e/wallet':
         specifier: workspace:*
         version: link:../wallet
-      '@midnight-ntwrk/compact-runtime':
-        specifier: 0.16.0
-        version: 0.16.0
-      '@midnight-ntwrk/ledger-v8':
-        specifier: 8.1.0
-        version: 8.1.0
       '@midnight-ntwrk/midnight-js-contracts':
         specifier: 4.1.1
         version: 4.1.1
-      '@midnight-ntwrk/wallet-sdk-address-format':
-        specifier: ^3.1.2
-        version: 3.1.2
+      '@midnight-ntwrk/midnight-js-protocol':
+        specifier: 4.1.1
+        version: 4.1.1
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
@@ -130,12 +124,6 @@ importers:
       '@e2e/wallet':
         specifier: workspace:*
         version: link:../wallet
-      '@midnight-ntwrk/compact-js':
-        specifier: 2.5.1
-        version: 2.5.1
-      '@midnight-ntwrk/compact-runtime':
-        specifier: 0.16.0
-        version: 0.16.0
       '@midnight-ntwrk/midnight-js-contracts':
         specifier: 4.1.1
         version: 4.1.1
@@ -151,6 +139,9 @@ importers:
       '@midnight-ntwrk/midnight-js-node-zk-config-provider':
         specifier: 4.1.1
         version: 4.1.1
+      '@midnight-ntwrk/midnight-js-protocol':
+        specifier: 4.1.1
+        version: 4.1.1
     devDependencies:
       typescript:
         specifier: ^6.0.3
@@ -158,10 +149,10 @@ importers:
 
   e2e/packages/wallet:
     dependencies:
-      '@midnight-ntwrk/ledger-v8':
-        specifier: 8.1.0
-        version: 8.1.0
       '@midnight-ntwrk/midnight-js':
+        specifier: 4.1.1
+        version: 4.1.1
+      '@midnight-ntwrk/midnight-js-protocol':
         specifier: 4.1.1
         version: 4.1.1
       '@midnight-ntwrk/wallet-sdk':

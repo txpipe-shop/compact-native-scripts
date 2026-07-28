@@ -1,11 +1,15 @@
-import * as ledger from '@midnight-ntwrk/ledger-v8';
+import * as ledger from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { getNetworkId, setNetworkId } from '@midnight-ntwrk/midnight-js/network-id';
 import { type MidnightProvider, type WalletProvider } from '@midnight-ntwrk/midnight-js/types';
-import { DustWallet } from '@midnight-ntwrk/wallet-sdk/dust';
-import { WalletFacade } from '@midnight-ntwrk/wallet-sdk/facade';
-import { Roles } from '@midnight-ntwrk/wallet-sdk/hd';
-import { ShieldedWallet } from '@midnight-ntwrk/wallet-sdk/shielded';
-import { createKeystore, PublicKey, UnshieldedWallet } from '@midnight-ntwrk/wallet-sdk/unshielded';
+import {
+  DustWallet,
+  ShieldedWallet,
+  WalletFacade,
+  Roles,
+  createKeystore,
+  PublicKey,
+  UnshieldedWallet,
+} from '@midnight-ntwrk/wallet-sdk';
 import * as Rx from 'rxjs';
 import {
   deriveKeysFromSeed,

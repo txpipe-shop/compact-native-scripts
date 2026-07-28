@@ -10,6 +10,8 @@ import {
   PrivateStateId,
 } from './types.js';
 
+export type { TokenSupplyContractProviders };
+
 const currentDir = path.resolve(new URL(import.meta.url).pathname, '..');
 export const contractConfig = {
   zkConfigPath: path.resolve(currentDir, 'managed', 'tokensupply'),
