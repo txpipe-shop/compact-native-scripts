@@ -78,7 +78,13 @@ to create the commitment that was provided to initialize the Warden contract.
 WALLET_MNEMONIC=<your mnemonic>
 WARDEN_SECRET=<your secret>
 WARDEN_RANDOMNESS=<your randomness>
+MIDNIGHT_STORAGE_PASSWORD=<password for encrypting private state on disk>
 ```
+
+`MIDNIGHT_STORAGE_PASSWORD` is required to encrypt private state on disk via the
+`level-private-state-provider`. See the
+[`validatePassword` API reference](https://docs.midnight.network/api-reference/midnight-js/@midnight-ntwrk/midnight-js-utils/functions/validatePassword)
+for the password strength policy.
 
 When running on the local devnet, you can skip these values — the CLI offers
 preset wallet options (1 through 4) with built-in credentials.
