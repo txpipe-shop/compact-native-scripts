@@ -75,12 +75,12 @@ export circuit mint(amount: Uint<64>,
   Warden_verify();
   assert((currentSupply + amount) as Uint<64> <= cap,
          "TokenSupply: exceeds cap");
+  assert(amount > 0, "TokenSupply: attempting to mint non-positive value");
   currentSupply = disclose((currentSupply + amount) as Uint<64>);
-  const color = tokenType(domain, kernel.self());
   mintNonce = evolveNonce(mintCounter, mintNonce);
   mintCounter.increment(1);
   return mintShieldedToken(
-    disclose(color),
+    disclose(domain),
     disclose(amount),
     disclose(mintNonce),
     disclose(left<ZswapCoinPublicKey, ContractAddress>(recipient))
@@ -95,7 +95,15 @@ export circuit mint(amount: Uint<64>,
  */
 export circuit burn(coin: ShieldedCoinInfo): [] {
   Warden_verify();
+  const color = tokenType(domain, kernel.self());
+  assert(coin.color == color, "TokenSupply: color does not match");
+  assert(coin.value > 0, "TokenSupply: attempting to burn non-positive value");
+  assert(coin.value <= (currentSupply as Uint<128>), "TokenSupply: underflow");
   receiveShielded(disclose(coin));
-  // TO-DO: send to burnAddress
+  const result = sendImmediateShielded(
+    disclose(coin),
+    disclose(shieldedBurnAddress()),
+    disclose(coin.value)
+  );
   currentSupply = disclose((currentSupply - coin.value) as Uint<64>);
 }
