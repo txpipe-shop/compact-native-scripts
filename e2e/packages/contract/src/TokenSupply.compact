@@ -100,6 +100,10 @@ export circuit burn(coin: ShieldedCoinInfo): [] {
   assert(coin.value > 0, "TokenSupply: attempting to burn non-positive value");
   assert(coin.value <= (currentSupply as Uint<128>), "TokenSupply: underflow");
   receiveShielded(disclose(coin));
-  // TO-DO: send to burnAddress
+  const result = sendImmediateShielded(
+    disclose(coin),
+    disclose(shieldedBurnAddress()),
+    disclose(coin.value)
+  );
   currentSupply = disclose((currentSupply - coin.value) as Uint<64>);
 }
